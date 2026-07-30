@@ -1,0 +1,61 @@
+name: Broadsheet
+options:
+  bundleIdPrefix: com.helix
+  deploymentTarget:
+    iOS: "18.0"
+  createIntermediateGroups: true
+settings:
+  base:
+    SWIFT_VERSION: "5.0"
+targets:
+  Broadsheet:
+    type: application
+    platform: iOS
+    deploymentTarget: "18.0"
+    sources:
+      - path: Broadsheet
+    settings:
+      base:
+        TARGETED_DEVICE_FAMILY: "1,2"
+        PRODUCT_BUNDLE_IDENTIFIER: com.helix.broadsheet
+        ENABLE_PREVIEWS: YES
+    info:
+      path: Broadsheet/Info.plist
+      properties:
+        CFBundleDisplayName: Broadsheet
+        UILaunchScreen: {}
+        UISupportedInterfaceOrientations:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        UISupportedInterfaceOrientations~ipad:
+          - UIInterfaceOrientationPortrait
+          - UIInterfaceOrientationPortraitUpsideDown
+          - UIInterfaceOrientationLandscapeLeft
+          - UIInterfaceOrientationLandscapeRight
+        UIApplicationSceneManifest:
+          UIApplicationSupportsMultipleScenes: false
+  BroadsheetTests:
+    type: bundle.unit-test
+    platform: iOS
+    deploymentTarget: "18.0"
+    sources:
+      - path: BroadsheetTests
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.helix.broadsheet.tests
+        TARGETED_DEVICE_FAMILY: "1,2"
+    dependencies:
+      - target: Broadsheet
+  BroadsheetUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    deploymentTarget: "18.0"
+    sources:
+      - path: BroadsheetUITests
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.helix.broadsheet.uitests
+        TARGETED_DEVICE_FAMILY: "1,2"
+    dependencies:
+      - target: Broadsheet
