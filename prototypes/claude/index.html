@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Broadsheet: Today</title>
+<meta name="description" content="Static visual prototype of the Today surface for Broadsheet, a private native news reader.">
+<link rel="stylesheet" href="styles.css">
+<script>
+  /* Applied before first paint so the theme never flashes. */
+  (function () {
+    try {
+      var p = localStorage.getItem("bs.theme") || "auto";
+      var t = p === "auto" ? (matchMedia("(prefers-color-scheme: dark)").matches ? "night" : "paper") : p;
+      document.documentElement.setAttribute("data-theme", t);
+      document.documentElement.setAttribute("data-theme-pref", p);
+    } catch (e) {}
+  })();
+</script>
+</head>
+<body>
+
+<a class="skip" href="#today">Skip to today's stories</a>
+
+<div class="stage">
+
+  <!-- Prototype scaffolding. Not part of the product interface. -->
+  <div class="proto">
+    <p class="proto__label">Prototype controls, not part of the product</p>
+    <div class="proto__group">
+      <span>Screen</span>
+      <a href="index.html" aria-current="page">Today</a>
+      <a href="article.html">Article</a>
+    </div>
+    <div class="proto__group">
+      <span>Width</span>
+      <button type="button" data-width-set="390" aria-pressed="true">390</button>
+      <button type="button" data-width-set="430" aria-pressed="false">430</button>
+    </div>
+    <div class="proto__group">
+      <span>Theme</span>
+      <button type="button" data-theme-set="auto" aria-pressed="true">Auto</button>
+      <button type="button" data-theme-set="paper" aria-pressed="false">Paper</button>
+      <button type="button" data-theme-set="night" aria-pressed="false">Night</button>
+      <button type="button" data-theme-set="oled" aria-pressed="false">OLED</button>
+    </div>
+  </div>
+
+  <div class="device">
+    <div class="screen">
+
+      <div class="statusbar" aria-hidden="true">
+        <span>6:42</span>
+        <span class="statusbar__right">
+          <span class="statusbar__bars"><i></i><i></i><i></i><i></i></span>
+          <span class="statusbar__batt"><span></span></span>
+        </span>
+      </div>
+
+      <div class="scroll">
+        <main id="today">
+
+          <header class="today__head">
+            <p class="today__id">Broadsheet</p>
+            <h1 class="today__date">Thursday, July 30</h1>
+            <div class="today__status">
+              <p>Updated 6:41 AM. 12 sources, 3 still extracting.</p>
+              <button type="button" class="today__refresh" data-action="toast" data-toast="Feeds refreshed. 4 new stories.">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M20.5 12a8.5 8.5 0 1 1-2.6-6.1"></path>
+                  <path d="M20.5 4v5h-5"></path>
+                </svg>
+                Refresh
+              </button>
+            </div>
+          </header>
+
+          <!-- ============ Band 1: lead story ============ -->
+
+          <section aria-labelledby="lead-label">
+            <div class="band__head">
+              <h2 class="band__title" id="lead-label">Lead story</h2>
+            </div>
+
+            <article>
+              <a class="lead" href="article.html">
+                <div class="lead__fig">
+                  <svg class="ph" viewBox="0 0 800 450" role="img" aria-labelledby="fig-lead" preserveAspectRatio="xMidYMid slice">
+                    <title id="fig-lead">Transmission towers along a dry ridge at first light</title>
+                    <defs>
+                      <linearGradient id="sky-lead" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0" stop-color="#5f7d95"></stop>
+                        <stop offset="0.45" stop-color="#b9c0c2"></stop>
+                        <stop offset="1" stop-color="#e5d6bd"></stop>
+                      </linearGradient>
+                    </defs>
+                    <rect width="800" height="450" fill="url(#sky-lead)"></rect>
+                    <circle cx="608" cy="286" r="52" fill="#f4e3c1" opacity="0.7"></circle>
+                    <path d="M0 300 L130 274 L245 296 L360 264 L482 292 L604 258 L716 286 L800 268 L800 450 L0 450Z" fill="#95907c"></path>
+                    <g stroke="#3c3a33" stroke-width="3" fill="none">
+                      <path d="M150 340 L138 246 M150 340 L162 246 M138 246 L162 246"></path>
+                      <path d="M120 268 L180 268 M126 250 L174 250"></path>
+                      <path d="M420 352 L406 232 M420 352 L434 232 M406 232 L434 232"></path>
+                      <path d="M386 258 L454 258 M392 238 L448 238"></path>
+                      <path d="M680 344 L668 254 M680 344 L692 254 M668 254 L692 254"></path>
+                      <path d="M652 274 L708 274 M658 258 L702 258"></path>
+                    </g>
+                    <g stroke="#4a4740" stroke-width="1.6" fill="none" opacity="0.9">
+                      <path d="M120 268 Q285 306 386 258"></path>
+                      <path d="M180 268 Q300 310 454 258"></path>
+                      <path d="M454 258 Q560 300 652 274"></path>
+                      <path d="M448 238 Q560 284 658 258"></path>
+                    </g>
+                    <path d="M0 352 L170 330 L340 356 L520 328 L690 354 L800 336 L800 450 L0 450Z" fill="#736e5c"></path>
+                    <path d="M0 404 L800 380 L800 450 L0 450Z" fill="#544f43"></path>
+                  </svg>
+                </div>
+                <div class="lead__body">
+                  <p class="kicker">Energy</p>
+                  <h3 class="hed lead__hed">Grid Operators Warn Summer Reserve Margins Are Thinner Than Forecast</h3>
+                  <p class="dek lead__dek">Three regional operators told federal regulators this week that projected August reserves fall below their own planning targets, citing delayed transmission upgrades and a hotter overnight load.</p>
+                  <p class="meta lead__meta">
+                    <span class="src">Meridian Wire</span>
+                    <span class="dot" aria-hidden="true"></span>
+                    <time datetime="2026-07-30T06:12">6:12 AM</time>
+                    <span class="dot" aria-hidden="true"></span>
+                    <span>9 min read</span>
+                  </p>
+                </div>
+              </a>
+            </article>
+          </section>
+
+          <!-- ============ Band 2: multi-source cluster ============ -->
+
+          <section class="cluster" aria-labelledby="cluster-hed">
+            <p class="cluster__count">Six sources covering this</p>
+            <a class="hed cluster__hed" href="article.html" id="cluster-hed">Federal Court Sends the Western Water Allocation Rule Back to the Agency</a>
+
+            <div class="spectrum">
+              <div class="spectrum__bars" role="img" aria-label="Coverage by source baseline: 1 left, 2 center-left, 1 center, 1 center-right, 0 right, 1 not rated.">
+                <b data-n="1"></b>
+                <b data-n="2"></b>
+                <b data-n="1"></b>
+                <b data-n="1"></b>
+                <b data-n="0"></b>
+                <b data-n="1"></b>
+              </div>
+              <div class="spectrum__scale" aria-hidden="true">
+                <span>L</span><span>CL</span><span>C</span><span>CR</span><span>R</span><span>N/A</span>
+              </div>
+              <p class="spectrum__note">
+                No source rated right has covered this yet.
+                <button type="button" data-open="sheet-spectrum">What is this?</button>
+              </p>
+            </div>
+
+            <ul class="cluster__sources">
+              <li>
+                <a class="csrc" href="article.html">
+                  <span class="mark" aria-hidden="true">MW</span>
+                  <span>
+                    <span class="csrc__name">Meridian Wire</span>
+                    <span class="csrc__hed">Appeals court vacates water allocation rule, orders new rulemaking</span>
+                    <span class="csrc__meta">
+                      <span class="lean"><span class="lean__tick" data-pos="c" aria-hidden="true"><i></i></span>Center</span>
+                      <span>5:31 AM</span>
+                    </span>
+                  </span>
+                </a>
+              </li>
+              <li>
+                <a class="csrc" href="article.html">
+                  <span class="mark" aria-hidden="true">DR</span>
+                  <span>
+                    <span class="csrc__name">The Delta Review</span>
+                    <span class="csrc__hed">Farmers lose the certainty they spent four years arguing for</span>
+                    <span class="csrc__meta">
+                      <span class="lean"><span class="lean__tick" data-pos="cl" aria-hidden="true"><i></i></span>Center-left</span>
+                      <span>5:58 AM</span>
+                    </span>
+                  </span>
+                </a>
+              </li>
+              <li>
+                <a class="csrc" href="article.html">
+                  <span class="mark" aria-hidden="true">NJ</span>
+                  <span>
+                    <span class="csrc__name">Northgate Journal</span>
+                    <span class="csrc__hed">Court faults agency for skipping the cost analysis it promised</span>
+                    <span class="csrc__meta">
+                      <span class="lean"><span class="lean__tick" data-pos="cr" aria-hidden="true"><i></i></span>Center-right</span>
+                      <span>6:04 AM</span>
+                    </span>
+                  </span>
+                </a>
+              </li>
+            </ul>
+
+            <div class="cluster__actions">
+              <button type="button" class="btn btn--quiet" data-open="sheet-compare">Compare headlines</button>
+              <button type="button" class="btn btn--quiet" data-action="toast" data-toast="Three more sources would expand here.">Show 3 more</button>
+            </div>
+          </section>
+
+          <!-- ============ Band 3: the river ============ -->
+
+          <section aria-labelledby="river-label">
+            <div class="band__head">
+              <h2 class="band__title" id="river-label">From your sources</h2>
+              <span class="kicker">Newest first</span>
+            </div>
+
+            <h3 class="dayhead">Today</h3>
+
+            <div class="river">
+
+              <article class="row">
+                <a class="row__link" href="article.html">
+                  <div class="row__text">
+                    <p class="kicker">Business</p>
+                    <h4 class="row__hed">Regulators Open an Inquiry Into How Grocery Wholesalers Share Pricing Data</h4>
+                    <p class="meta row__meta">
+                      <span class="src">Northgate Journal</span>
+                      <span class="dot" aria-hidden="true"></span>
+                      <time datetime="2026-07-30T05:48">5:48 AM</time>
+                      <span class="dot" aria-hidden="true"></span>
+                      <span>6 min</span>
+                    </p>
+                  </div>
+                  <div class="row__thumb">
+                    <svg class="ph" viewBox="0 0 200 200" role="img" aria-labelledby="fig-groc" preserveAspectRatio="xMidYMid slice">
+                      <title id="fig-groc">Stacked produce crates in a distribution warehouse</title>
+                      <rect width="200" height="200" fill="#cbbfa8"></rect>
+                      <rect x="0" y="128" width="200" height="72" fill="#9d8f76"></rect>
+                      <g fill="#8a6f4a">
+                        <rect x="14" y="96" width="52" height="34" rx="3"></rect>
+                        <rect x="14" y="60" width="52" height="34" rx="3"></rect>
+                        <rect x="74" y="108" width="52" height="34" rx="3"></rect>
+                        <rect x="134" y="88" width="52" height="34" rx="3"></rect>
+                        <rect x="134" y="52" width="52" height="34" rx="3"></rect>
+                      </g>
+                      <g fill="#6e5638" opacity="0.55">
+                        <rect x="14" y="96" width="52" height="6"></rect>
+                        <rect x="74" y="108" width="52" height="6"></rect>
+                        <rect x="134" y="88" width="52" height="6"></rect>
+                      </g>
+                      <g fill="#a8823f">
+                        <circle cx="40" cy="52" r="8"></circle>
+                        <circle cx="56" cy="54" r="7"></circle>
+                        <circle cx="160" cy="44" r="8"></circle>
+                      </g>
+                    </svg>
+                  </div>
+                </a>
+              </article>
+
+              <article class="row row--compact">
+                <a class="row__link" href="article.html">
+                  <div class="row__text">
+                    <h4 class="row__hed">City Council Delays the Riverfront Zoning Overlay for a Third Time</h4>
+                    <p class="meta row__meta">
+                      <span class="src">Statehouse Monitor</span>
+                      <span class="dot" aria-hidden="true"></span>
+                      <time datetime="2026-07-30T05:20">5:20 AM</time>
+                      <span class="dot" aria-hidden="true"></span>
+                      <span>4 min</span>
+                    </p>
+                  </div>
+                </a>
+              </article>
+
+              <article class="row row--feature">
+                <a class="row__link" href="article.html">
+                  <div class="row__fig">
+                    <svg class="ph" viewBox="0 0 600 400" role="img" aria-labelledby="fig-night" preserveAspectRatio="xMidYMid slice">
+                      <title id="fig-night">A lit distribution building at night with loading bays</title>
+                      <defs>
+                        <linearGradient id="sky-night" x1="0" y1="0" x2="0" y2="1">
+                          <stop offset="0" stop-color="#1c2738"></stop>
+                          <stop offset="1" stop-color="#3d4553"></stop>
+                        </linearGradient>
+                      </defs>
+                      <rect width="600" height="400" fill="url(#sky-night)"></rect>
+                      <circle cx="96" cy="70" r="3" fill="#cdd6e2" opacity="0.7"></circle>
+                      <circle cx="460" cy="48" r="2.4" fill="#cdd6e2" opacity="0.6"></circle>
+                      <circle cx="248" cy="40" r="2" fill="#cdd6e2" opacity="0.5"></circle>
+                      <rect x="40" y="168" width="520" height="150" fill="#2b3140"></rect>
+                      <rect x="40" y="158" width="520" height="14" fill="#39404f"></rect>
+                      <g fill="#e8c98a">
+                        <rect x="70" y="192" width="46" height="30" rx="2"></rect>
+                        <rect x="132" y="192" width="46" height="30" rx="2"></rect>
+                        <rect x="256" y="192" width="46" height="30" rx="2" opacity="0.45"></rect>
+                        <rect x="318" y="192" width="46" height="30" rx="2"></rect>
+                        <rect x="442" y="192" width="46" height="30" rx="2" opacity="0.6"></rect>
+                      </g>
+                      <g fill="#1b2029">
+                        <rect x="70" y="256" width="86" height="62" rx="2"></rect>
+                        <rect x="188" y="256" width="86" height="62" rx="2"></rect>
+                        <rect x="306" y="256" width="86" height="62" rx="2"></rect>
+                        <rect x="424" y="256" width="86" height="62" rx="2"></rect>
+                      </g>
+                      <rect x="188" y="256" width="86" height="62" fill="#d8b878" opacity="0.8"></rect>
+                      <rect x="0" y="318" width="600" height="82" fill="#20242c"></rect>
+                      <g stroke="#5a6270" stroke-width="3" stroke-dasharray="26 22">
+                        <path d="M0 366 H600"></path>
+                      </g>
+                      <rect x="392" y="240" width="120" height="78" rx="4" fill="#454c59"></rect>
+                      <rect x="404" y="252" width="42" height="26" rx="2" fill="#8d95a3"></rect>
+                    </svg>
+                  </div>
+                  <div class="row__text">
+                    <p class="kicker">Longform</p>
+                    <h4 class="row__hed">The Quiet Reengineering of the Night Shift</h4>
+                    <p class="dek row__dek">Warehouses rebuilt their overnight schedules around automation that never fully arrived. The people left on the floor are absorbing the difference.</p>
+                    <p class="meta row__meta">
+                      <span class="src">The Delta Review</span>
+                      <span class="dot" aria-hidden="true"></span>
+                      <time datetime="2026-07-30T04:30">4:30 AM</time>
+                      <span class="dot" aria-hidden="true"></span>
+                      <span>18 min</span>
+                    </p>
+                  </div>
+                </a>
+              </article>
+
+              <article class="row row--compact">
+                <a class="row__link" href="article.html">
+                  <div class="row__text">
+                    <h4 class="row__hed">Semiconductor Packaging Plant Adds a Second Line in Chandler</h4>
+                    <p class="meta row__meta">
+                      <span class="src">Cascade Business Daily</span>
+                      <span class="dot" aria-hidden="true"></span>
+                      <time datetime="2026-07-30T04:02">4:02 AM</time>
+                      <span class="dot" aria-hidden="true"></span>
+                      <span class="chip">Feed only</span>
+                    </p>
+                  </div>
+                </a>
+              </article>
+
+              <article class="row row--compact">
+                <a class="row__link" href="article.html">
+                  <div class="row__text">
+                    <p class="kicker kicker--opinion">Opinion</p>
+                    <h4 class="row__hed">The Interconnection Queue Is the Bottleneck Nobody Wants to Own</h4>
+                    <p class="meta row__meta">
+                      <span class="src">Frontier Dispatch</span>
+                      <span class="dot" aria-hidden="true"></span>
+                      <time datetime="2026-07-30T03:55">3:55 AM</time>
+                      <span class="dot" aria-hidden="true"></span>
+                      <span>7 min</span>
+                    </p>
+                  </div>
+                </a>
+              </article>
+
+            </div>
+
+            <h3 class="dayhead">Yesterday</h3>
+
+            <div class="river">
+
+              <article class="row row--compact">
+                <a class="row__link" href="article.html">
+                  <div class="row__text">
+                    <h4 class="row__hed">Smoke Advisory Extended Across Four Counties Through the Weekend</h4>
+                    <p class="meta row__meta">
+                      <span class="src">Coastline Public Radio</span>
+                      <span class="dot" aria-hidden="true"></span>
+                      <time datetime="2026-07-29T21:14">9:14 PM</time>
+                      <span class="dot" aria-hidden="true"></span>
+                      <span class="chip">Partial</span>
+                    </p>
+                  </div>
+                </a>
+              </article>
+
+              <article class="row">
+                <a class="row__link" href="article.html">
+                  <div class="row__text">
+                    <h4 class="row__hed">Rail Union Ratifies a Contract After Six Months of Talks</h4>
+                    <p class="meta row__meta">
+                      <span class="src">Meridian Wire</span>
+                      <span class="dot" aria-hidden="true"></span>
+                      <time datetime="2026-07-29T19:02">7:02 PM</time>
+                      <span class="dot" aria-hidden="true"></span>
+                      <span>5 min</span>
+                    </p>
+                  </div>
+                  <div class="row__thumb">
+                    <svg class="ph" viewBox="0 0 200 200" role="img" aria-labelledby="fig-rail" preserveAspectRatio="xMidYMid slice">
+                      <title id="fig-rail">Freight cars in a rail yard under an overcast sky</title>
+                      <rect width="200" height="200" fill="#b7bcc0"></rect>
+                      <rect x="0" y="120" width="200" height="80" fill="#8c8a85"></rect>
+                      <rect x="0" y="150" width="200" height="6" fill="#6d6a64"></rect>
+                      <rect x="0" y="176" width="200" height="6" fill="#6d6a64"></rect>
+                      <g>
+                        <rect x="6" y="86" width="72" height="42" rx="3" fill="#7d5a4a"></rect>
+                        <rect x="86" y="86" width="72" height="42" rx="3" fill="#4f6070"></rect>
+                        <rect x="166" y="86" width="72" height="42" rx="3" fill="#6a6a52"></rect>
+                      </g>
+                      <g fill="#3f3d3a">
+                        <circle cx="22" cy="134" r="7"></circle>
+                        <circle cx="62" cy="134" r="7"></circle>
+                        <circle cx="102" cy="134" r="7"></circle>
+                        <circle cx="142" cy="134" r="7"></circle>
+                        <circle cx="182" cy="134" r="7"></circle>
+                      </g>
+                      <rect x="0" y="80" width="200" height="4" fill="#9ea3a7"></rect>
+                    </svg>
+                  </div>
+                </a>
+              </article>
+
+            </div>
+
+            <p class="endnote">That is everything from the last 24 hours.<br>Older stories stay in Library.</p>
+          </section>
+
+        </main>
+      </div>
+
+      <nav class="tabbar" aria-label="Primary">
+        <a class="tab" href="index.html" aria-current="page">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <rect x="3.5" y="4" width="17" height="16" rx="2.5"></rect>
+            <path d="M7 9h10M7 13h6M7 16.5h8"></path>
+          </svg>
+          Today
+        </a>
+        <button class="tab" type="button" data-action="toast" data-toast="Library is not part of this visual prototype.">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M5 4.5h4.5v15H5zM11.5 4.5H16v15h-4.5z"></path>
+            <path d="M18 5.4l2.6 14.2"></path>
+          </svg>
+          Library
+        </button>
+        <button class="tab" type="button" data-action="toast" data-toast="Search is not part of this visual prototype.">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="6.5"></circle>
+            <path d="M16 16l4 4"></path>
+          </svg>
+          Search
+        </button>
+      </nav>
+
+      <p class="toast" role="status" aria-live="polite" data-show="false"></p>
+
+    </div>
+  </div>
+</div>
+
+<!-- ============ Sheets ============ -->
+
+<dialog class="sheet" id="sheet-spectrum" aria-labelledby="spectrum-title">
+  <div class="sheet__head">
+    <h2 class="sheet__title" id="spectrum-title">About source baselines</h2>
+    <button type="button" class="sheet__close" data-close>Done</button>
+  </div>
+  <div class="sheet__body">
+    <p>This strip shows how many of the sources covering a story sit at each point on their publisher baseline scale. It describes coverage, not correctness, and it says nothing about any single article.</p>
+    <p>Baselines come from AllSides, dated March 2026. Sources with no published rating appear in the N/A column rather than being dropped, because dropping them would make coverage look more balanced than it is.</p>
+    <p>The strip only appears when at least three sources cover a story and at least two of them carry a rating.</p>
+    <dl class="sheet__dl">
+      <div><dt>Provider</dt><dd>AllSides</dd></div>
+      <div><dt>Snapshot</dt><dd>March 2026</dd></div>
+      <div><dt>Scale</dt><dd>Left to Right, plus N/A</dd></div>
+      <div><dt>Applies to</dt><dd>Publisher, not article</dd></div>
+    </dl>
+    <p><a class="textlink" href="https://www.allsides.com/about/media-bias-rating-methods" target="_blank" rel="noopener noreferrer">Read the provider's method</a></p>
+  </div>
+</dialog>
+
+<dialog class="sheet" id="sheet-compare" aria-labelledby="compare-title">
+  <div class="sheet__head">
+    <h2 class="sheet__title" id="compare-title">Compare headlines</h2>
+    <button type="button" class="sheet__close" data-close>Done</button>
+  </div>
+  <div class="sheet__body">
+    <ul class="compare">
+      <li>
+        <p class="compare__src"><span class="mark" aria-hidden="true">MW</span>Meridian Wire<span class="lean"><span class="lean__tick" data-pos="c" aria-hidden="true"><i></i></span>Center</span></p>
+        <p class="compare__hed">Appeals court vacates water allocation rule, orders new rulemaking</p>
+      </li>
+      <li>
+        <p class="compare__src"><span class="mark" aria-hidden="true">DR</span>The Delta Review<span class="lean"><span class="lean__tick" data-pos="cl" aria-hidden="true"><i></i></span>Center-left</span></p>
+        <p class="compare__hed">Farmers lose the certainty they spent four years arguing for</p>
+      </li>
+      <li>
+        <p class="compare__src"><span class="mark" aria-hidden="true">NJ</span>Northgate Journal<span class="lean"><span class="lean__tick" data-pos="cr" aria-hidden="true"><i></i></span>Center-right</span></p>
+        <p class="compare__hed">Court faults agency for skipping the cost analysis it promised</p>
+      </li>
+      <li>
+        <p class="compare__src"><span class="mark" aria-hidden="true">CP</span>Coastline Public Radio<span class="lean"><span class="lean__tick" data-pos="cl" aria-hidden="true"><i></i></span>Center-left</span></p>
+        <p class="compare__hed">Tribes and irrigation districts both call the ruling a setback</p>
+      </li>
+      <li>
+        <p class="compare__src"><span class="mark" aria-hidden="true">FD</span>Frontier Dispatch<span class="lean"><span class="lean__tick" data-pos="l" aria-hidden="true"><i></i></span>Left</span></p>
+        <p class="compare__hed">A rule written for growers is sent back for a rewrite</p>
+      </li>
+      <li>
+        <p class="compare__src"><span class="mark" aria-hidden="true">BC</span>Basin Chronicle<span class="lean"><span class="lean__tick" data-pos="na" aria-hidden="true"><i></i></span>Not rated</span></p>
+        <p class="compare__hed">What the ruling means for the 2027 allocation year</p>
+      </li>
+    </ul>
+  </div>
+</dialog>
+
+<script src="app.js"></script>
+</body>
+</html>

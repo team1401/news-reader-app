@@ -1,0 +1,559 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Broadsheet: Today</title>
+<meta name="description" content="Visual prototype of the Today feed for Broadsheet, a private native news reader.">
+<link rel="stylesheet" href="styles.css">
+<script>
+  // Apply theme and warmth settings before first paint to prevent flashes
+  (function () {
+    try {
+      var themePref = localStorage.getItem("bs.theme") || "auto";
+      var resolvedTheme = themePref === "auto" ? (matchMedia("(prefers-color-scheme: dark)").matches ? "night" : "paper") : themePref;
+      document.documentElement.setAttribute("data-theme", resolvedTheme);
+      document.documentElement.setAttribute("data-theme-pref", themePref);
+      
+      var warmth = localStorage.getItem("bs.warmth") || "0";
+      document.documentElement.setAttribute("data-warmth", warmth);
+    } catch (e) {}
+  })();
+</script>
+</head>
+<body>
+
+<a class="skip" href="#today">Skip to today's stories</a>
+
+<div class="stage">
+
+  <!-- Prototype Scaffolding (External Controls) -->
+  <div class="proto" role="region" aria-label="Prototype Controls">
+    <p class="proto__label">Prototype controls (Not part of the product interface)</p>
+    <div class="proto__row">
+      <div class="proto__group">
+        <span>Screen:</span>
+        <a href="index.html" aria-current="page">Today</a>
+        <a href="article.html">Article</a>
+      </div>
+      <div class="proto__group">
+        <span>Width:</span>
+        <button type="button" data-width-set="390" aria-pressed="true">390px</button>
+        <button type="button" data-width-set="430" aria-pressed="false">430px</button>
+      </div>
+      <div class="proto__group">
+        <span>Theme:</span>
+        <button type="button" data-theme-set="auto" aria-pressed="true">Auto</button>
+        <button type="button" data-theme-set="paper" aria-pressed="false">Paper</button>
+        <button type="button" data-theme-set="night" aria-pressed="false">Night</button>
+        <button type="button" data-theme-set="oled" aria-pressed="false">OLED</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Device Wrapper -->
+  <div class="device">
+    <div class="screen" tabindex="-1">
+
+      <!-- Statusbar -->
+      <div class="statusbar" aria-hidden="true">
+        <span>9:41</span>
+        <div class="statusbar__right">
+          <span class="statusbar__bars"><i></i><i></i><i></i><i></i></span>
+          <span class="statusbar__batt"><span></span></span>
+        </div>
+      </div>
+
+      <!-- Main Scroll Surface -->
+      <div class="scroll">
+        <main id="today">
+
+          <!-- Spacious Editorial Header -->
+          <header class="today__head">
+            <p class="today__id">Broadsheet</p>
+            <h1 class="today__date">Thursday, July 30</h1>
+            <div class="today__status">
+              <p>Updated 9:40 AM (12 sources connected)</p>
+              <button type="button" class="today__refresh" data-action="toast" data-toast="Feeds refreshed: 3 new articles found.">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l.73-1.19"></path>
+                </svg>
+                Refresh
+              </button>
+            </div>
+          </header>
+
+          <!-- ============ Band 1: Lead Story (High Imagery) ============ -->
+          <section aria-labelledby="lead-label">
+            <div class="band__head">
+              <h2 class="band__title" id="lead-label">Lead Story</h2>
+            </div>
+
+            <article>
+              <a class="lead" href="article.html">
+                <!-- High-fidelity Vector Illustration representing energy grids and transmission lines -->
+                <div class="lead__fig">
+                  <svg class="ph" viewBox="0 0 800 450" role="img" aria-label="Sunset landscape with transmission towers and mountain ranges" preserveAspectRatio="xMidYMid slice">
+                    <defs>
+                      <linearGradient id="sky-sunset" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stop-color="#4c6077"></stop>
+                        <stop offset="35%" stop-color="#738b9c"></stop>
+                        <stop offset="70%" stop-color="#d0a68d"></stop>
+                        <stop offset="100%" stop-color="#e9c8a7"></stop>
+                      </linearGradient>
+                    </defs>
+                    <!-- Sky background -->
+                    <rect width="800" height="450" fill="url(#sky-sunset)"></rect>
+                    <!-- Sun glow -->
+                    <circle cx="580" cy="270" r="60" fill="#fadab4" opacity="0.65"></circle>
+                    <!-- Distant mountains -->
+                    <path d="M0 320 L150 280 L290 310 L440 270 L600 300 L740 265 L800 290 L800 450 L0 450Z" fill="#887f73" opacity="0.8"></path>
+                    <path d="M0 360 L210 330 L390 370 L580 325 L750 355 L800 340 L800 450 L0 450Z" fill="#665f54" opacity="0.9"></path>
+                    
+                    <!-- Energy infrastructure elements -->
+                    <g stroke="#302d28" stroke-width="2.5" fill="none">
+                      <!-- Left Tower -->
+                      <path d="M180 370 L165 250 M180 370 L195 250 M165 250 L195 250 M160 270 L200 270 M155 295 L205 295 M150 325 L210 325"></path>
+                      <path d="M165 250 L180 370 M195 250 L180 370"></path>
+                      <!-- Right Tower -->
+                      <path d="M520 355 L508 230 M520 355 L532 230 M508 230 L532 230 M504 250 L536 250 M500 275 L540 275 M494 305 L546 305"></path>
+                      <path d="M508 230 L520 355 M532 230 L520 355"></path>
+                    </g>
+                    <!-- Cable connections -->
+                    <g stroke="#423e38" stroke-width="1.2" fill="none" opacity="0.85">
+                      <path d="M0 260 Q80 290 165 250 Q335 305 508 230 Q650 280 800 240"></path>
+                      <path d="M0 280 Q80 310 160 270 Q335 320 504 250 Q650 300 800 260"></path>
+                    </g>
+                    <!-- Foreground terrain -->
+                    <path d="M0 400 L240 375 L480 410 L680 380 L800 405 L800 450 L0 450Z" fill="#4d473e"></path>
+                    <path d="M0 430 L800 415 L800 450 L0 450Z" fill="#36322b"></path>
+                  </svg>
+                </div>
+                <div class="lead__body">
+                  <p class="kicker">Energy</p>
+                  <h3 class="hed lead__hed">Grid Operators Warn Summer Reserve Margins Are Thinner Than Forecast</h3>
+                  <p class="dek lead__dek">Three regional operators warned that projected August reserves fall below planning targets due to transmission delays.</p>
+                  <p class="meta lead__meta">
+                    <span class="src">Meridian Wire</span>
+                    <span class="dot" aria-hidden="true"></span>
+                    <button class="bias-badge-btn" data-lean="c" data-open="sheet-article-bias" aria-label="On-device article estimate: Center. Tap for details.">
+                      <svg class="on-device-icon" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+                      Center
+                    </button>
+                    <span class="pub-baseline-sec">Pub: Center</span>
+                    <span class="dot" aria-hidden="true"></span>
+                    <time datetime="2026-07-30T09:12">6:12 AM</time>
+                    <span class="dot" aria-hidden="true"></span>
+                    <span>9 min read</span>
+                  </p>
+                </div>
+              </a>
+            </article>
+          </section>
+
+          <!-- ============ Band 2: Story Cluster ============ -->
+          <section class="cluster" aria-labelledby="cluster-hed">
+            <div class="cluster__count">Six sources covering this</div>
+            <a class="hed cluster__hed" href="article.html" id="cluster-hed">Federal Court Sends the Western Water Allocation Rule Back to the Agency</a>
+
+            <!-- Perspective distribution strip -->
+            <div class="spectrum-bar" role="img" aria-label="Perspective distribution showing Left-leaning and Center-leaning coverage dominance">
+              <div class="spectrum-bar__segment" data-lean="l" title="Left-leaning: 20%"></div>
+              <div class="spectrum-bar__segment" data-lean="cl" title="Center-Left: 35%"></div>
+              <div class="spectrum-bar__segment" data-lean="c" title="Center: 15%"></div>
+              <div class="spectrum-bar__segment" data-lean="cr" title="Center-Right: 15%"></div>
+              <div class="spectrum-bar__segment" data-lean="r" title="Right-leaning: 5%"></div>
+              <div class="spectrum-bar__segment" data-lean="na" title="Not Rated: 10%"></div>
+            </div>
+
+            <div class="cluster__meta">
+              <span>Coverage by source baseline</span>
+              <button class="spectrum-button" type="button" data-open="sheet-spectrum">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <circle cx="12" cy="12" r="10"></circle>
+                  <line x1="12" y1="16" x2="12" y2="12"></line>
+                  <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                </svg>
+                About baselines
+              </button>
+            </div>
+
+            <!-- List of coverage elements inside cluster -->
+            <ul class="cluster__sources">
+              <li class="cluster__item">
+                <a class="cluster__link" href="article.html">
+                  <h4 class="cluster__title">Appeals court vacates water allocation rule, orders new rulemaking</h4>
+                  <div class="cluster__source-meta">
+                    <span class="src">Meridian Wire</span>
+                    <span class="dot" aria-hidden="true"></span>
+                    <button class="bias-badge-btn" data-lean="c" data-open="sheet-article-bias" aria-label="On-device article estimate: Center. Tap for details.">
+                      <svg class="on-device-icon" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg> Center
+                    </button>
+                    <span class="pub-baseline-sec">Pub: Center</span>
+                    <span class="dot" aria-hidden="true"></span>
+                    <span>1 hour ago</span>
+                  </div>
+                </a>
+              </li>
+              <li class="cluster__item">
+                <a class="cluster__link" href="article.html">
+                  <h4 class="cluster__title">Farmers lose the certainty they spent four years arguing for</h4>
+                  <div class="cluster__source-meta">
+                    <span class="src">The Delta Review</span>
+                    <span class="dot" aria-hidden="true"></span>
+                    <button class="bias-badge-btn" data-lean="l" data-open="sheet-article-bias" aria-label="On-device article estimate: Left. Tap for details.">
+                      <svg class="on-device-icon" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg> Left
+                    </button>
+                    <span class="pub-baseline-sec">Pub: Center-Left</span>
+                    <span class="dot" aria-hidden="true"></span>
+                    <span>2 hours ago</span>
+                  </div>
+                </a>
+              </li>
+              <li class="cluster__item">
+                <a class="cluster__link" href="article.html">
+                  <h4 class="cluster__title">Court faults agency for skipping the cost analysis it promised</h4>
+                  <div class="cluster__source-meta">
+                    <span class="src">Northgate Journal</span>
+                    <span class="dot" aria-hidden="true"></span>
+                    <button class="bias-badge-btn" data-lean="r" data-open="sheet-article-bias" aria-label="On-device article estimate: Right. Tap for details.">
+                      <svg class="on-device-icon" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg> Right
+                    </button>
+                    <span class="pub-baseline-sec">Pub: Center-Right</span>
+                    <span class="dot" aria-hidden="true"></span>
+                    <span>3 hours ago</span>
+                  </div>
+                </a>
+              </li>
+            </ul>
+
+            <div class="cluster__actions">
+              <button class="btn-secondary" type="button" data-open="sheet-compare">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M12 20h9M3 20h9M3 4h18M3 12h18"></path>
+                </svg>
+                Compare Headlines
+              </button>
+            </div>
+          </section>
+
+          <!-- ============ Band 3: The River ============ -->
+          <section aria-labelledby="river-label">
+            <div class="band__head">
+              <h2 class="band__title" id="river-label">From your sources</h2>
+            </div>
+
+            <!-- River item 1: split layout with right-aligned thumbnail -->
+            <a class="river-item river-item--split" href="article.html">
+              <div class="river-item__left">
+                <p class="kicker">Regulation</p>
+                <h3 class="hed river-item__title">Federal Trade Commission Launches Probe into Supermarket Supply Chains</h3>
+                <p class="meta">
+                  <span class="src">Frontier Dispatch</span>
+                  <span class="dot" aria-hidden="true"></span>
+                  <button class="bias-badge-btn" data-lean="l" data-open="sheet-article-bias" aria-label="On-device article estimate: Left. Tap for details.">
+                    <svg class="on-device-icon" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg> Left
+                  </button>
+                  <span class="pub-baseline-sec">Pub: Left</span>
+                  <span class="dot" aria-hidden="true"></span>
+                  <span>4 hours ago</span>
+                </p>
+              </div>
+              <div class="river-item__thumb">
+                <svg viewBox="0 0 100 100" role="img" aria-label="Abstract grocery crates representation">
+                  <rect width="100" height="100" fill="#a4b3a2"></rect>
+                  <rect x="15" y="15" width="30" height="30" fill="#f0edf3" opacity="0.9"></rect>
+                  <rect x="55" y="15" width="30" height="30" fill="#f0edf3" opacity="0.9"></rect>
+                  <rect x="15" y="55" width="30" height="30" fill="#f0edf3" opacity="0.9"></rect>
+                  <rect x="55" y="55" width="30" height="30" fill="#f0edf3" opacity="0.9"></rect>
+                  <line x1="15" y1="48" x2="85" y2="48" stroke="#5B7B61" stroke-width="3"></line>
+                </svg>
+              </div>
+            </a>
+
+            <!-- River item 2: Text only layout -->
+            <a class="river-item" href="article.html">
+              <p class="kicker">Finance</p>
+              <h3 class="hed river-item__title">Treasury Yields Stabilize Ahead of Federal Reserve August Meeting</h3>
+              <p class="dek">Market participants adjust pricing for debt instruments as recent manufacturing index results point to moderate demand expansion without major cost escalation.</p>
+              <p class="meta">
+                <span class="src">Lombard Ledger</span>
+                <span class="dot" aria-hidden="true"></span>
+                <button class="bias-badge-btn" data-lean="c" data-open="sheet-article-bias" aria-label="On-device article estimate: Center. Tap for details.">
+                  <svg class="on-device-icon" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg> Center
+                </button>
+                <span class="pub-baseline-sec">Pub: Center-Right</span>
+                <span class="dot" aria-hidden="true"></span>
+                <span>5 hours ago</span>
+              </p>
+            </a>
+
+            <!-- River item 3: Full width visual card -->
+            <a class="river-item" href="article.html">
+              <div class="lead__fig" style="margin-bottom: var(--s3);">
+                <svg class="ph" viewBox="0 0 800 450" role="img" aria-label="Desert mountains landscape" preserveAspectRatio="xMidYMid slice">
+                  <defs>
+                    <linearGradient id="sky-desert-star" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="0%" stop-color="#141c2b"></stop>
+                      <stop offset="60%" stop-color="#2a3e5c"></stop>
+                      <stop offset="100%" stop-color="#8c7a6b"></stop>
+                    </linearGradient>
+                  </defs>
+                  <rect width="800" height="450" fill="url(#sky-desert-star)"></rect>
+                  <!-- Milky Way dust lane -->
+                  <path d="M300 0 Q400 200 650 450 L750 450 Q500 200 400 0Z" fill="#ffebd4" opacity="0.12" filter="blur(10px)"></path>
+                  <!-- Distant peaks -->
+                  <path d="M0 350 L120 300 L250 330 L380 290 L520 340 L690 310 L800 360 L800 450 L0 450Z" fill="#4d4239" opacity="0.8"></path>
+                  <path d="M0 380 L200 360 L410 400 L620 350 L780 390 L800 375 L800 450 L0 450Z" fill="#2d2621"></path>
+                  <!-- Small stars -->
+                  <circle cx="100" cy="80" r="1" fill="#FFF"></circle>
+                  <circle cx="210" cy="120" r="1.5" fill="#FFF" opacity="0.8"></circle>
+                  <circle cx="340" cy="60" r="1" fill="#FFF"></circle>
+                  <circle cx="480" cy="150" r="1.2" fill="#FFF" opacity="0.9"></circle>
+                  <circle cx="680" cy="90" r="2" fill="#FFF" opacity="0.75"></circle>
+                </svg>
+              </div>
+              <p class="kicker">Travel & Tourism</p>
+              <h3 class="hed river-item__title">How the Chihuahuan Desert is Reshaping Terlingua's Ecotourism</h3>
+              <p class="dek">Unregulated properties and off-grid camps face county-level scrutiny as visitors seek pristine dark skies near Brewster County border lines.</p>
+              <p class="meta">
+                <span class="src">West Texas Field Notes</span>
+                <span class="dot" aria-hidden="true"></span>
+                <button class="bias-badge-btn" data-lean="na" data-open="sheet-article-bias" aria-label="On-device article estimate: N/A. Tap for details.">
+                  <svg class="on-device-icon" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg> N/A
+                </button>
+                <span class="pub-baseline-sec">Pub: N/A</span>
+                <span class="dot" aria-hidden="true"></span>
+                <span>Yesterday</span>
+              </p>
+            </a>
+          </section>
+
+        </main>
+      </div>
+
+      <!-- Tabbar -->
+      <nav class="tabbar" aria-label="App Navigation">
+        <a class="tab" href="index.html" aria-current="page">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+            <polyline points="9 22 9 12 15 12 15 22"></polyline>
+          </svg>
+          Today
+        </a>
+        <button class="tab" type="button" data-open="sheet-library" aria-label="Open Library">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path>
+            <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path>
+          </svg>
+          Library
+        </button>
+        <button class="tab" type="button" data-action="toast" data-toast="Search indexing is disabled in this visual prototype.">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <circle cx="11" cy="11" r="8"></circle>
+            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+          </svg>
+          Search
+        </button>
+      </nav>
+
+      <!-- Interactive Toast -->
+      <p class="toast" role="status" aria-live="polite" data-show="false"></p>
+
+    </div>
+  </div>
+</div>
+
+<!-- ============ Dialog Sheets ============ -->
+
+<!-- Library Dialog Sheet -->
+<dialog class="sheet" id="sheet-library" aria-labelledby="library-title">
+  <div class="sheet__wrapper">
+    <div class="sheet__head">
+      <h2 class="sheet__title" id="library-title">Library</h2>
+      <button type="button" class="sheet__close" data-close>Done</button>
+    </div>
+    <div class="sheet__body" style="padding: 0;">
+      <!-- Search Folders Section -->
+      <div style="padding: var(--s4) var(--gutter) var(--s2) var(--gutter);">
+        <h3 class="sheet__subsection-title" style="margin-bottom: var(--s2);">Folders</h3>
+      </div>
+      <!-- Fix the clipped category navigation scroll -->
+      <nav class="categories" aria-label="Library Folders" style="border-bottom: var(--hair) solid var(--border-color); margin-bottom: var(--s4);">
+        <a class="cat-pill" href="#" aria-current="page">Today</a>
+        <a class="cat-pill" href="#" data-action="toast" data-toast="Business is not part of this visual prototype.">Business</a>
+        <a class="cat-pill" href="#" data-action="toast" data-toast="Technology is not part of this visual prototype.">Tech</a>
+        <a class="cat-pill" href="#" data-action="toast" data-toast="Science is not part of this visual prototype.">Science</a>
+        <a class="cat-pill" href="#" data-action="toast" data-toast="Opinion is not part of this visual prototype.">Opinion</a>
+        <a class="cat-pill" href="#" data-action="toast" data-toast="Culture is not part of this visual prototype.">Culture</a>
+      </nav>
+
+      <div style="padding: 0 var(--gutter) var(--gutter) var(--gutter);">
+        <!-- Library menu list -->
+        <ul style="list-style: none; display: flex; flex-direction: column; gap: var(--s3);">
+          <li style="border-bottom: var(--hair) solid var(--border-color); padding-bottom: var(--s3);">
+            <a href="#" data-action="toast" data-toast="Opening saved stories..." style="text-decoration: none; color: var(--text-primary); display: flex; align-items: center; justify-content: space-between; font-weight: 600;">
+              <span>Bookmarks &amp; Saved</span>
+              <span style="color: var(--text-secondary); font-size: var(--fs-meta);">14 stories ›</span>
+            </a>
+          </li>
+          <li style="border-bottom: var(--hair) solid var(--border-color); padding-bottom: var(--s3);">
+            <a href="#" data-action="toast" data-toast="Opening reading history..." style="text-decoration: none; color: var(--text-primary); display: flex; align-items: center; justify-content: space-between; font-weight: 600;">
+              <span>Reading History</span>
+              <span style="color: var(--text-secondary); font-size: var(--fs-meta);">Today 9:40 AM ›</span>
+            </a>
+          </li>
+          <li style="border-bottom: var(--hair) solid var(--border-color); padding-bottom: var(--s3);">
+            <a href="#" data-action="toast" data-toast="Opening source configurations..." style="text-decoration: none; color: var(--text-primary); display: flex; align-items: center; justify-content: space-between; font-weight: 600;">
+              <span>Connected Sources</span>
+              <span style="color: var(--text-secondary); font-size: var(--fs-meta);">12 active ›</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</dialog>
+
+<!-- Article Bias Analysis & Methodology Dialog -->
+<dialog class="sheet" id="sheet-article-bias" aria-labelledby="bias-analysis-title">
+  <div class="sheet__wrapper">
+    <div class="sheet__head">
+      <h2 class="sheet__title" id="bias-analysis-title">On-Device Bias Analysis</h2>
+      <button type="button" class="sheet__close" data-close>Done</button>
+    </div>
+    <div class="sheet__body">
+      <div class="analysis-status">
+        <svg class="on-device-icon-large" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true" style="color: var(--accent-color); margin-bottom: var(--s2);">
+          <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+          <line x1="12" y1="18" x2="12.01" y2="18"></line>
+        </svg>
+        <p class="analysis-status__title">Analyzed privately on this device</p>
+        <p class="analysis-status__subtitle">Local inference ensemble completed in 42ms</p>
+      </div>
+
+      <dl class="sheet__dl">
+        <div><dt>Article Lean Estimate</dt><dd><span class="bias-pill" data-lean="c">Center</span></dd></div>
+        <div><dt>Confidence Level</dt><dd>High (94% consensus)</dd></div>
+        <div><dt>Model Ensemble</dt><dd>CoreML Classifier v1.4 &amp; System LM Judge</dd></div>
+        <div><dt>Publisher Baseline</dt><dd>Left-Center (AllSides, Mar 2026)</dd></div>
+      </dl>
+
+      <div class="sheet__section">
+        <h3 class="sheet__subsection-title">Analysis Methodology</h3>
+        <p>Broadsheet evaluates political framing locally. To prevent memorizing publisher identities, publisher name, URL, and metadata are stripped from the article text before it is evaluated by a Core ML text classifier and on-device language models.</p>
+      </div>
+
+      <div class="sheet__section">
+        <h3 class="sheet__subsection-title">Short Rationale</h3>
+        <p class="rationale-text">The text focuses on structural supply chain adjustments, manufacturing sovereignty, and logistics infrastructure, presenting trade-offs neutrally. Partisan language and policy advocacy are absent, resulting in a balanced Center classification.</p>
+      </div>
+
+      <div class="sheet__section">
+        <h3 class="sheet__subsection-title">Evidence Spans</h3>
+        <blockquote class="evidence-quote">"Security of supply has become the primary constraint. Price is secondary when an entire line can be halted by a single delayed shipment."</blockquote>
+        <blockquote class="evidence-quote">"Ultimately, the stability of these new arrangements depends on institutional flexibility."</blockquote>
+      </div>
+
+      <div class="sheet__section">
+        <h3 class="sheet__subsection-title">Manual Correction</h3>
+        <p class="sheet__help-text">If this estimate feels incorrect, you can adjust the local model's classification weights for future evaluations. Your corrections stay private to this device.</p>
+        <div class="correction-controls">
+          <button type="button" class="btn-correction" data-action="toast" data-toast="Feedback saved. Thank you!">Left</button>
+          <button type="button" class="btn-correction" data-action="toast" data-toast="Feedback saved. Thank you!">Center</button>
+          <button type="button" class="btn-correction" data-action="toast" data-toast="Feedback saved. Thank you!">Right</button>
+          <button type="button" class="btn-correction" data-action="toast" data-toast="Feedback saved. Thank you!">N/A</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</dialog>
+
+<!-- Spectrum Info Dialog -->
+<dialog class="sheet" id="sheet-spectrum" aria-labelledby="spectrum-title">
+  <div class="sheet__wrapper">
+    <div class="sheet__head">
+      <h2 class="sheet__title" id="spectrum-title">About Source Baselines</h2>
+      <button type="button" class="sheet__close" data-close>Done</button>
+    </div>
+    <div class="sheet__body">
+      <p>This distribution strip displays the aggregate political classification profile of the publishers reporting on this specific story cluster.</p>
+      <p>Source classifications reflect publisher assessments compiled in early 2026. The distribution represents broad source coverage rather than individual story assessments.</p>
+      <p>The rating distribution displays only when a news cluster contains reporting from at least three different publishers.</p>
+      <dl class="sheet__dl">
+        <div><dt>Data Provider</dt><dd>AllSides Media</dd></div>
+        <div><dt>Latest Audit</dt><dd>March 2026</dd></div>
+        <div><dt>Classifications</dt><dd>Earthy spectrum (Left to Right)</dd></div>
+      </dl>
+      <p><a class="textlink" href="#" data-action="toast" data-toast="External browser links are inactive in this prototype.">Review classification methodology</a></p>
+    </div>
+  </div>
+</dialog>
+
+<!-- Comparison Dialog -->
+<dialog class="sheet" id="sheet-compare" aria-labelledby="compare-title">
+  <div class="sheet__wrapper">
+    <div class="sheet__head">
+      <h2 class="sheet__title" id="compare-title">Compare Headlines</h2>
+      <button type="button" class="sheet__close" data-close>Done</button>
+    </div>
+    <div class="sheet__body">
+      <ul class="compare">
+        <li>
+          <div class="compare__src">
+            <span>Meridian Wire</span>
+            <button class="bias-badge-btn" data-lean="c" data-open="sheet-article-bias" aria-label="On-device article estimate: Center. Tap for details.">
+              <svg class="on-device-icon" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg> Center
+            </button>
+            <span class="pub-baseline-sec">Pub: Center</span>
+          </div>
+          <p class="compare__hed">Appeals court vacates water allocation rule, orders new rulemaking</p>
+        </li>
+        <li>
+          <div class="compare__src">
+            <span>The Delta Review</span>
+            <button class="bias-badge-btn" data-lean="l" data-open="sheet-article-bias" aria-label="On-device article estimate: Left. Tap for details.">
+              <svg class="on-device-icon" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg> Left
+            </button>
+            <span class="pub-baseline-sec">Pub: Center-Left</span>
+          </div>
+          <p class="compare__hed">Farmers lose the certainty they spent four years arguing for</p>
+        </li>
+        <li>
+          <div class="compare__src">
+            <span>Northgate Journal</span>
+            <button class="bias-badge-btn" data-lean="r" data-open="sheet-article-bias" aria-label="On-device article estimate: Right. Tap for details.">
+              <svg class="on-device-icon" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg> Right
+            </button>
+            <span class="pub-baseline-sec">Pub: Center-Right</span>
+          </div>
+          <p class="compare__hed">Court faults agency for skipping the cost analysis it promised</p>
+        </li>
+        <li>
+          <div class="compare__src">
+            <span>Coastline Public Radio</span>
+            <button class="bias-badge-btn" data-lean="c" data-open="sheet-article-bias" aria-label="On-device article estimate: Center. Tap for details.">
+              <svg class="on-device-icon" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg> Center
+            </button>
+            <span class="pub-baseline-sec">Pub: Center-Left</span>
+          </div>
+          <p class="compare__hed">Tribes and irrigation districts both call the ruling a setback</p>
+        </li>
+        <li>
+          <div class="compare__src">
+            <span>Frontier Dispatch</span>
+            <button class="bias-badge-btn" data-lean="l" data-open="sheet-article-bias" aria-label="On-device article estimate: Left. Tap for details.">
+              <svg class="on-device-icon" width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg> Left
+            </button>
+            <span class="pub-baseline-sec">Pub: Left</span>
+          </div>
+          <p class="compare__hed">A rule written for growers is sent back for a rewrite</p>
+        </li>
+      </ul>
+    </div>
+  </div>
+</dialog>
+
+<script src="app.js"></script>
+</body>
+</html>

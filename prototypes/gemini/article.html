@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Broadsheet: Article Reader</title>
+<meta name="description" content="Visual prototype of the native Article Reader for Broadsheet.">
+<link rel="stylesheet" href="styles.css">
+<script>
+  // Apply theme and warmth settings before first paint to prevent flashes
+  (function () {
+    try {
+      var themePref = localStorage.getItem("bs.theme") || "auto";
+      var resolvedTheme = themePref === "auto" ? (matchMedia("(prefers-color-scheme: dark)").matches ? "night" : "paper") : themePref;
+      document.documentElement.setAttribute("data-theme", resolvedTheme);
+      document.documentElement.setAttribute("data-theme-pref", themePref);
+      
+      var warmth = localStorage.getItem("bs.warmth") || "0";
+      document.documentElement.setAttribute("data-warmth", warmth);
+    } catch (e) {}
+  })();
+</script>
+</head>
+<body>
+
+<a class="skip" href="#article-content">Skip to article content</a>
+
+<div class="stage">
+
+  <!-- Prototype Scaffolding (External Controls) -->
+  <div class="proto" role="region" aria-label="Prototype Controls">
+    <p class="proto__label">Prototype controls (Not part of the product interface)</p>
+    <div class="proto__row">
+      <div class="proto__group">
+        <span>Screen:</span>
+        <a href="index.html">Today</a>
+        <a href="article.html" aria-current="page">Article</a>
+      </div>
+      <div class="proto__group">
+        <span>Width:</span>
+        <button type="button" data-width-set="390" aria-pressed="true">390px</button>
+        <button type="button" data-width-set="430" aria-pressed="false">430px</button>
+      </div>
+      <div class="proto__group">
+        <span>Theme:</span>
+        <button type="button" data-theme-set="auto" aria-pressed="true">Auto</button>
+        <button type="button" data-theme-set="paper" aria-pressed="false">Paper</button>
+        <button type="button" data-theme-set="night" aria-pressed="false">Night</button>
+        <button type="button" data-theme-set="oled" aria-pressed="false">OLED</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Device Wrapper -->
+  <div class="device">
+    <div class="screen" tabindex="-1">
+
+      <!-- Statusbar -->
+      <div class="statusbar" aria-hidden="true">
+        <span>9:41</span>
+        <div class="statusbar__right">
+          <span class="statusbar__bars"><i></i><i></i><i></i><i></i></span>
+          <span class="statusbar__batt"><span></span></span>
+        </div>
+      </div>
+
+      <!-- Reading Progress Line -->
+      <div class="progress-container" aria-hidden="true">
+        <div class="progress-bar"></div>
+      </div>
+
+      <!-- Navigation Top Bar -->
+      <nav class="article__nav" aria-label="Article actions">
+        <a class="nav-btn" href="index.html" aria-label="Back to Today feed">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <polyline points="15 18 9 12 15 6"></polyline>
+          </svg>
+          Today
+        </a>
+        
+        <span class="nav-domain">theatlantic.com</span>
+        
+        <div style="display: flex; gap: 4px;">
+          <!-- Save button -->
+          <button class="nav-btn" type="button" data-action="save" aria-pressed="false" aria-label="Save this article to Library">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
+            </svg>
+          </button>
+          
+          <!-- Reading settings toggle -->
+          <button class="nav-btn" type="button" data-action="toggle-settings" aria-pressed="false" aria-label="Adjust reading typography and brightness">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="3"></circle>
+              <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+          </button>
+        </div>
+      </nav>
+
+      <!-- Settings Panel (Collapsible reading configuration drawer) -->
+      <div class="settings-panel" data-visible="false" role="region" aria-label="Reading options">
+        <!-- Font Selection -->
+        <div class="settings-panel__row">
+          <span class="settings-panel__label">Font Style</span>
+          <div class="seg-control">
+            <button type="button" data-body-set="serif" aria-pressed="true">Serif</button>
+            <button type="button" data-body-set="sans" aria-pressed="false">Sans</button>
+          </div>
+        </div>
+        <!-- Font Size Selection -->
+        <div class="settings-panel__row">
+          <span class="settings-panel__label">Text Size</span>
+          <div class="seg-control">
+            <button type="button" data-size-set="s" aria-pressed="false">A</button>
+            <button type="button" data-size-set="m" aria-pressed="true">A</button>
+            <button type="button" data-size-set="l" aria-pressed="false">A</button>
+          </div>
+        </div>
+        <!-- Library Lamp Dimmer (Signature Feature) -->
+        <div class="settings-panel__row">
+          <span class="settings-panel__label">Library Lamp</span>
+          <div class="slider-container">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true">
+              <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M6.34 17.66l-1.41 1.41M19.07 4.93l-1.41 1.41"></path>
+            </svg>
+            <input class="warmth-slider" type="range" min="0" max="3" value="0" aria-label="Adjust warmth and paper tone settings">
+            <span class="warmth-label">Alabaster</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Article Scroll Container -->
+      <div class="scroll">
+        <article class="article">
+
+          <!-- Header info -->
+          <header class="article__header">
+            <div class="article__bias-header">
+              <button class="bias-pill bias-pill--estimate" data-lean="c" data-open="sheet-article-bias" aria-label="On-device article estimate: Center. Tap for details.">
+                <svg class="on-device-icon" width="8" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" aria-hidden="true"><rect x="5" y="2" width="14" height="20" rx="2"></rect><line x1="12" y1="18" x2="12.01" y2="18"></line></svg>
+                Center
+              </button>
+              <span class="on-device-badge-label">On-device estimate</span>
+              <span class="dot" aria-hidden="true"></span>
+              <button class="article__bias-prompt" type="button" data-open="sheet-provenance" aria-label="Publisher baseline: Left-Center. Tap for details.">
+                Publisher: Left-Center
+              </button>
+            </div>
+            
+            <h1 class="article__title">Global Stability: Charting a Path Through Geopolitical Uncertainty</h1>
+            <p class="article__dek">Across the continent, leaders are adjusting to shifting alliances, changing trade policies, and evolving supply lines that were once taken for granted.</p>
+            
+            <div class="article__byline">
+              <span>By <strong>Eleanor Vance</strong></span>
+              <span class="dot" aria-hidden="true"></span>
+              <time datetime="2026-10-28">October 28, 2026</time>
+              <span class="dot" aria-hidden="true"></span>
+              <span>9 min read</span>
+            </div>
+
+            <!-- Top Canonical Action Button -->
+            <a class="btn-primary" href="#" data-action="toast" data-toast="Opening canonical publisher website in new window...">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                <polyline points="15 3 21 3 21 9"></polyline>
+                <line x1="10" y1="14" x2="21" y2="3"></line>
+              </svg>
+              Read at The Atlantic
+            </a>
+          </header>
+
+          <!-- Hero Image -->
+          <div class="article__hero">
+            <div class="article__hero-img">
+              <svg viewBox="0 0 800 450" role="img" aria-label="Clean industrial cargo harbor scene with ship and large automated cranes" class="ph">
+                <defs>
+                  <linearGradient id="harbor-sky" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="#3c4c66"></stop>
+                    <stop offset="50%" stop-color="#5b7291"></stop>
+                    <stop offset="100%" stop-color="#93a8c4"></stop>
+                  </linearGradient>
+                </defs>
+                <!-- Sky -->
+                <rect width="800" height="450" fill="url(#harbor-sky)"></rect>
+                <!-- Distant shore / mountains -->
+                <path d="M0 340 L160 310 L300 335 L450 300 L620 330 L800 295 L800 450 L0 450Z" fill="#717c8f" opacity="0.8"></path>
+                <path d="M0 365 L220 345 L410 380 L600 340 L800 365 L800 450 L0 450Z" fill="#525d6e"></path>
+                
+                <!-- Gantry cranes background -->
+                <g stroke="#353e4c" stroke-width="2.5" fill="none" opacity="0.9">
+                  <!-- Crane Left -->
+                  <path d="M210 350 L195 240 M230 350 L205 240 M190 240 L260 240 M205 240 L215 200 L240 240"></path>
+                  <path d="M195 240 L230 350 M205 240 L210 350" stroke-width="1.2" opacity="0.7"></path>
+                  <!-- Crane Right -->
+                  <path d="M340 360 L328 230 M360 360 L338 230 M320 230 L395 230 M338 230 L348 190 L375 230"></path>
+                </g>
+
+                <!-- Water -->
+                <path d="M0 380 L800 380 L800 450 L0 450Z" fill="#323b49"></path>
+                
+                <!-- Cargo ship outline -->
+                <path d="M50 410 L280 410 L340 385 L750 385 L735 415 L700 422 L50 422Z" fill="#1b2129"></path>
+                <path d="M720 385 L710 360 L630 360 L625 385Z" fill="#EAEAEA"></path>
+                <rect x="640" y="365" width="20" height="15" fill="#1b2129"></rect>
+                <!-- Stacked cargo containers -->
+                <g fill="#5B7B61" opacity="0.9">
+                  <rect x="120" y="380" width="30" height="15"></rect>
+                  <rect x="152" y="380" width="30" height="15" fill="#A96E52"></rect>
+                  <rect x="184" y="380" width="30" height="15" fill="#AB8862"></rect>
+                  <rect x="136" y="363" width="30" height="15" fill="#AB8862"></rect>
+                  <rect x="168" y="363" width="30" height="15" fill="#5B7B61"></rect>
+                </g>
+                
+                <!-- Reflections in the harbor -->
+                <ellipse cx="400" cy="435" rx="300" ry="2" fill="#EAEAEA" opacity="0.15"></ellipse>
+              </svg>
+            </div>
+            <p class="article__caption">
+              Container vessels dock under automated gantry installations at the Port of Tacoma.
+              <span class="article__credit">Photo by Arthur Vance / Getty Images</span>
+            </p>
+          </div>
+
+          <!-- Editorial Article Body -->
+          <div class="article__content" id="article-content">
+            <p class="lead-paragraph">The international system is experiencing a period of significant structural recalibration. Across the continent, leaders are adjusting to shifting alliances, changing trade policies, and evolving supply lines that were once taken for granted. In recent months, multi-national agreements that stood for decades have faced unprecedented pressure from bilateral negotiation frameworks.</p>
+            
+            <p>Analysts point to a variety of factors contributing to this transformation. Resource distributions, labor shifts, and technological migrations have altered the calculations of national planners. As a result, the distinction between economic policy and security planning has largely vanished.</p>
+            
+            <h2>The Supply Chain Boundary</h2>
+            
+            <p>At the center of this tension is the concept of manufacturing sovereignty. Industries that rely on timely component deliveries are seeking domestic alternatives, accepting higher baseline costs in exchange for supply certainty. Some companies report carrying up to three months of reserve inventory, a practice that would have been rejected as inefficient a decade ago.</p>
+            
+            <blockquote>
+              Security of supply has become the primary constraint. Price is secondary when an entire line can be halted by a single delayed shipment.
+            </blockquote>
+            
+            <p>This operational shift introduces friction into long-range logistics planning. The historical emphasis on efficiency, which drove capital toward low-cost manufacturing centers, is giving way to a logic of redundancy and proximity. Many executives note that the transition is structural rather than temporary.</p>
+
+            <h2>Regional Adjustments</h2>
+            
+            <p>Local jurisdictions are reacting to these changes by enacting regional incentives. The Chihuahuan Desert region, historically focused on resource extraction, is seeing a surge in ecological investment and solar energy infrastructure, mirroring shifts across other borders.</p>
+
+            <!-- Inline Figure Card -->
+            <div class="inline-figure" role="figure" aria-labelledby="fig-index-title">
+              <p class="inline-figure__title" id="fig-index-title">Geopolitical Shift Index</p>
+              <p class="inline-figure__desc">Annualized trend showing logistics adjustment indices across key international shipping hubs.</p>
+              
+              <!-- Clean structural graphic representation -->
+              <div class="inline-chart" aria-hidden="true">
+                <div class="inline-chart__col" data-val="1" data-label="2023" data-num="1.2"></div>
+                <div class="inline-chart__col" data-val="2" data-label="2024" data-num="2.8"></div>
+                <div class="inline-chart__col" data-val="3" data-label="2025" data-num="4.6"></div>
+                <div class="inline-chart__col" data-val="4" data-label="2026" data-num="3.1"></div>
+              </div>
+              <p class="inline-chart__caption">Index values compile logistics volume deviations, capital relocations, and regulatory updates.</p>
+            </div>
+
+            <p>Ultimately, the stability of these new arrangements depends on institutional flexibility. Without robust diplomatic buffers, minor disagreements over trade parameters can escalate into broader disputes, disrupting commerce and communication lines across borders. A return to the absolute integration of the early decade appears unlikely.</p>
+          </div>
+
+          <!-- Bottom Editorial Metadata & Perspectives Block -->
+          <footer class="article__perspective-footer">
+            <h2 class="article__footer-heading">Perspective Context</h2>
+            
+            <div class="perspective-grid">
+              <!-- Article Leaning (On-Device) Card -->
+              <div class="perspective-card" style="cursor: pointer;" data-open="sheet-article-bias">
+                <p class="perspective-card__label">Article Leaning (On-Device)</p>
+                <div class="perspective-card__val">
+                  <span class="bias-pill" data-lean="c">Center</span>
+                </div>
+                <p class="perspective-card__sub">CoreML Ensemble v1.4 • High Confidence</p>
+              </div>
+              
+              <!-- Publisher Baseline Card -->
+              <div class="perspective-card" style="cursor: pointer;" data-open="sheet-provenance">
+                <p class="perspective-card__label">Publisher Baseline</p>
+                <div class="perspective-card__val">
+                  <span class="bias-pill" data-lean="cl">Left-Center</span>
+                </div>
+                <p class="perspective-card__sub">AllSides media bias audit, March 2026</p>
+              </div>
+            </div>
+
+            <div class="article__footer-actions">
+              <!-- Bottom Canonical Action -->
+              <a class="btn-primary" href="#" data-action="toast" data-toast="Opening canonical publisher website in new window...">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                  <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                  <polyline points="15 3 21 3 21 9"></polyline>
+                  <line x1="10" y1="14" x2="21" y2="3"></line>
+                </svg>
+                Read Original at The Atlantic
+              </a>
+
+              <!-- Related Stories list -->
+              <ul class="related-list" aria-label="Related perspectives">
+                <li class="related-list__item">
+                  <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <h3 class="related-list__title">Appeals court vacates water allocation rule, orders new rulemaking</h3>
+                    <div class="related-list__meta">
+                      <span>Meridian Wire</span>
+                      <span class="dot" aria-hidden="true"></span>
+                      <span>Center</span>
+                    </div>
+                  </a>
+                </li>
+                <li class="related-list__item">
+                  <a href="index.html" style="text-decoration: none; color: inherit;">
+                    <h3 class="related-list__title">Farmers lose the certainty they spent four years arguing for</h3>
+                    <div class="related-list__meta">
+                      <span>The Delta Review</span>
+                      <span class="dot" aria-hidden="true"></span>
+                      <span>Center-Left</span>
+                    </div>
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </footer>
+
+        </article>
+      </div>
+
+      <!-- Interactive Toast -->
+      <p class="toast" role="status" aria-live="polite" data-show="false"></p>
+
+    </div>
+  </div>
+</div>
+
+<!-- ============ Dialog Sheets ============ -->
+
+<!-- Library Dialog Sheet -->
+<dialog class="sheet" id="sheet-library" aria-labelledby="library-title">
+  <div class="sheet__wrapper">
+    <div class="sheet__head">
+      <h2 class="sheet__title" id="library-title">Library</h2>
+      <button type="button" class="sheet__close" data-close>Done</button>
+    </div>
+    <div class="sheet__body" style="padding: 0;">
+      <!-- Search Folders Section -->
+      <div style="padding: var(--s4) var(--gutter) var(--s2) var(--gutter);">
+        <h3 class="sheet__subsection-title" style="margin-bottom: var(--s2);">Folders</h3>
+      </div>
+      <!-- Fix the clipped category navigation scroll -->
+      <nav class="categories" aria-label="Library Folders" style="border-bottom: var(--hair) solid var(--border-color); margin-bottom: var(--s4);">
+        <a class="cat-pill" href="#" aria-current="page">Today</a>
+        <a class="cat-pill" href="#" data-action="toast" data-toast="Business is not part of this visual prototype.">Business</a>
+        <a class="cat-pill" href="#" data-action="toast" data-toast="Technology is not part of this visual prototype.">Tech</a>
+        <a class="cat-pill" href="#" data-action="toast" data-toast="Science is not part of this visual prototype.">Science</a>
+        <a class="cat-pill" href="#" data-action="toast" data-toast="Opinion is not part of this visual prototype.">Opinion</a>
+        <a class="cat-pill" href="#" data-action="toast" data-toast="Culture is not part of this visual prototype.">Culture</a>
+      </nav>
+
+      <div style="padding: 0 var(--gutter) var(--gutter) var(--gutter);">
+        <!-- Library menu list -->
+        <ul style="list-style: none; display: flex; flex-direction: column; gap: var(--s3);">
+          <li style="border-bottom: var(--hair) solid var(--border-color); padding-bottom: var(--s3);">
+            <a href="#" data-action="toast" data-toast="Opening saved stories..." style="text-decoration: none; color: var(--text-primary); display: flex; align-items: center; justify-content: space-between; font-weight: 600;">
+              <span>Bookmarks &amp; Saved</span>
+              <span style="color: var(--text-secondary); font-size: var(--fs-meta);">14 stories ›</span>
+            </a>
+          </li>
+          <li style="border-bottom: var(--hair) solid var(--border-color); padding-bottom: var(--s3);">
+            <a href="#" data-action="toast" data-toast="Opening reading history..." style="text-decoration: none; color: var(--text-primary); display: flex; align-items: center; justify-content: space-between; font-weight: 600;">
+              <span>Reading History</span>
+              <span style="color: var(--text-secondary); font-size: var(--fs-meta);">Today 9:40 AM ›</span>
+            </a>
+          </li>
+          <li style="border-bottom: var(--hair) solid var(--border-color); padding-bottom: var(--s3);">
+            <a href="#" data-action="toast" data-toast="Opening source configurations..." style="text-decoration: none; color: var(--text-primary); display: flex; align-items: center; justify-content: space-between; font-weight: 600;">
+              <span>Connected Sources</span>
+              <span style="color: var(--text-secondary); font-size: var(--fs-meta);">12 active ›</span>
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</dialog>
+
+<!-- Article Bias Analysis & Methodology Dialog -->
+<dialog class="sheet" id="sheet-article-bias" aria-labelledby="bias-analysis-title">
+  <div class="sheet__wrapper">
+    <div class="sheet__head">
+      <h2 class="sheet__title" id="bias-analysis-title">On-Device Bias Analysis</h2>
+      <button type="button" class="sheet__close" data-close>Done</button>
+    </div>
+    <div class="sheet__body">
+      <div class="analysis-status">
+        <svg class="on-device-icon-large" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" aria-hidden="true" style="color: var(--accent-color); margin-bottom: var(--s2);">
+          <rect x="5" y="2" width="14" height="20" rx="2" ry="2"></rect>
+          <line x1="12" y1="18" x2="12.01" y2="18"></line>
+        </svg>
+        <p class="analysis-status__title">Analyzed privately on this device</p>
+        <p class="analysis-status__subtitle">Local inference ensemble completed in 42ms</p>
+      </div>
+
+      <dl class="sheet__dl">
+        <div><dt>Article Lean Estimate</dt><dd><span class="bias-pill" data-lean="c">Center</span></dd></div>
+        <div><dt>Confidence Level</dt><dd>High (94% consensus)</dd></div>
+        <div><dt>Model Ensemble</dt><dd>CoreML Classifier v1.4 &amp; System LM Judge</dd></div>
+        <div><dt>Publisher Baseline</dt><dd>Left-Center (AllSides, Mar 2026)</dd></div>
+      </dl>
+
+      <div class="sheet__section">
+        <h3 class="sheet__subsection-title">Analysis Methodology</h3>
+        <p>Broadsheet evaluates political framing locally. To prevent memorizing publisher identities, publisher name, URL, and metadata are stripped from the article text before it is evaluated by a Core ML text classifier and on-device language models.</p>
+      </div>
+
+      <div class="sheet__section">
+        <h3 class="sheet__subsection-title">Short Rationale</h3>
+        <p class="rationale-text">The text focuses on structural supply chain adjustments, manufacturing sovereignty, and logistics infrastructure, presenting trade-offs neutrally. Partisan language and policy advocacy are absent, resulting in a balanced Center classification.</p>
+      </div>
+
+      <div class="sheet__section">
+        <h3 class="sheet__subsection-title">Evidence Spans</h3>
+        <blockquote class="evidence-quote">"Security of supply has become the primary constraint. Price is secondary when an entire line can be halted by a single delayed shipment."</blockquote>
+        <blockquote class="evidence-quote">"Ultimately, the stability of these new arrangements depends on institutional flexibility."</blockquote>
+      </div>
+
+      <div class="sheet__section">
+        <h3 class="sheet__subsection-title">Manual Correction</h3>
+        <p class="sheet__help-text">If this estimate feels incorrect, you can adjust the local model's classification weights for future evaluations. Your corrections stay private to this device.</p>
+        <div class="correction-controls">
+          <button type="button" class="btn-correction" data-action="toast" data-toast="Feedback saved. Thank you!">Left</button>
+          <button type="button" class="btn-correction" data-action="toast" data-toast="Feedback saved. Thank you!">Center</button>
+          <button type="button" class="btn-correction" data-action="toast" data-toast="Feedback saved. Thank you!">Right</button>
+          <button type="button" class="btn-correction" data-action="toast" data-toast="Feedback saved. Thank you!">N/A</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</dialog>
+
+<!-- Provenance sheet dialog -->
+<dialog class="sheet" id="sheet-provenance" aria-labelledby="provenance-title">
+  <div class="sheet__wrapper">
+    <div class="sheet__head">
+      <h2 class="sheet__title" id="provenance-title">Baseline Provenance</h2>
+      <button type="button" class="sheet__close" data-close>Done</button>
+    </div>
+    <div class="sheet__body">
+      <p>This publisher's baseline rating represents an aggregate assessment of editorial output rather than a judgment on any single news article.</p>
+      <p>Determined by third-party audit methodologies, classifications describe general ideological coordinates to help readers contextualize reporting framing.</p>
+      <dl class="sheet__dl">
+        <div><dt>Audit Source</dt><dd>AllSides Media Bias</dd></div>
+        <div><dt>Date Published</dt><dd>March 2026</dd></div>
+        <div><dt>Confidence Rating</dt><dd>High</dd></div>
+        <div><dt>Classification</dt><dd>Left-Center</dd></div>
+      </dl>
+      <p><a class="textlink" href="#" data-action="toast" data-toast="External browser links are inactive in this prototype.">View audit details</a></p>
+    </div>
+  </div>
+</dialog>
+
+<script src="app.js"></script>
+</body>
+</html>

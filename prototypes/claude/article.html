@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Broadsheet: Grid Operators Warn Summer Reserve Margins Are Thinner Than Forecast</title>
+<meta name="description" content="Static visual prototype of the article reader for Broadsheet, a private native news reader.">
+<link rel="stylesheet" href="styles.css">
+<script>
+  (function () {
+    try {
+      var p = localStorage.getItem("bs.theme") || "auto";
+      var t = p === "auto" ? (matchMedia("(prefers-color-scheme: dark)").matches ? "night" : "paper") : p;
+      document.documentElement.setAttribute("data-theme", t);
+      document.documentElement.setAttribute("data-theme-pref", p);
+    } catch (e) {}
+  })();
+</script>
+</head>
+<body>
+
+<a class="skip" href="#story">Skip to the article</a>
+
+<div class="stage">
+
+  <!-- Prototype scaffolding. Not part of the product interface. -->
+  <div class="proto">
+    <p class="proto__label">Prototype controls, not part of the product</p>
+    <div class="proto__group">
+      <span>Screen</span>
+      <a href="index.html">Today</a>
+      <a href="article.html" aria-current="page">Article</a>
+    </div>
+    <div class="proto__group">
+      <span>Width</span>
+      <button type="button" data-width-set="390" aria-pressed="true">390</button>
+      <button type="button" data-width-set="430" aria-pressed="false">430</button>
+    </div>
+    <div class="proto__group">
+      <span>Theme</span>
+      <button type="button" data-theme-set="auto" aria-pressed="true">Auto</button>
+      <button type="button" data-theme-set="paper" aria-pressed="false">Paper</button>
+      <button type="button" data-theme-set="night" aria-pressed="false">Night</button>
+      <button type="button" data-theme-set="oled" aria-pressed="false">OLED</button>
+    </div>
+  </div>
+
+  <div class="device">
+    <div class="screen">
+
+      <div class="statusbar" aria-hidden="true">
+        <span>6:44</span>
+        <span class="statusbar__right">
+          <span class="statusbar__bars"><i></i><i></i><i></i><i></i></span>
+          <span class="statusbar__batt"><span></span></span>
+        </span>
+      </div>
+
+      <div class="navbar">
+        <a class="navbtn" href="index.html">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+            <path d="M14.5 5L8 12l6.5 7"></path>
+          </svg>
+          Today
+        </a>
+        <div class="navbar__group">
+          <button class="navbtn navbtn--aa" type="button" data-open="sheet-reading" aria-haspopup="dialog">
+            Aa<span class="vh">Reading settings</span>
+          </button>
+          <button class="navbtn" type="button" data-action="save" aria-pressed="false">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <path d="M6.5 4h11v16l-5.5-4-5.5 4z"></path>
+            </svg>
+            <span class="vh">Save this article</span>
+          </button>
+          <button class="navbtn" type="button" data-action="toast" data-toast="More actions are not part of this visual prototype.">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+              <circle cx="5.5" cy="12" r="1.7"></circle>
+              <circle cx="12" cy="12" r="1.7"></circle>
+              <circle cx="18.5" cy="12" r="1.7"></circle>
+            </svg>
+            <span class="vh">More actions</span>
+          </button>
+        </div>
+        <div class="progress" role="presentation"></div>
+      </div>
+
+      <div class="scroll">
+        <main>
+          <article class="article" id="story" data-size="m" data-body="serif">
+
+            <!-- 1. Source baseline and provenance, above the headline -->
+            <div class="sourceline">
+              <span class="mark mark--lg" aria-hidden="true">MW</span>
+              <div>
+                <p class="sourceline__name">Meridian Wire</p>
+                <p class="sourceline__lean">
+                  <span class="lean"><span class="lean__tick" data-pos="c" aria-hidden="true"><i></i></span>Source baseline: Center</span>
+                  <button type="button" class="provenance" data-open="sheet-provenance" aria-haspopup="dialog">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" aria-hidden="true">
+                      <circle cx="12" cy="12" r="9"></circle>
+                      <path d="M12 10.5v6.5" stroke-linecap="round"></path>
+                      <circle cx="12" cy="7.4" r="1.1" fill="currentColor" stroke="none"></circle>
+                    </svg>
+                    Where this comes from
+                  </button>
+                </p>
+              </div>
+            </div>
+
+            <div class="article__inner">
+              <!-- 2. Headline, dek, byline -->
+              <h1 class="article__hed">Grid Operators Warn Summer Reserve Margins Are Thinner Than Forecast</h1>
+              <p class="article__dek">Three regional operators told federal regulators this week that projected August reserves fall below their own planning targets, citing delayed transmission upgrades and a hotter overnight load.</p>
+              <p class="byline">
+                By <strong>Adaeze Okonjo</strong> and <strong>Martin Reyes</strong><br>
+                Published <time datetime="2026-07-30T06:12">July 30, 2026 at 6:12 AM</time>. 9 min read.
+                <span class="updated">Updated <time datetime="2026-07-30T09:14">July 30 at 9:14 AM</time></span>
+              </p>
+
+              <!-- 3. Canonical publisher action, above the first body block -->
+              <p class="article__cta">
+                <a class="btn" href="https://example.com/meridian-wire/grid-reserve-margins" target="_blank" rel="noopener noreferrer">
+                  <svg class="arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M8 16L16.5 7.5"></path>
+                    <path d="M9.5 7.5h7v7"></path>
+                  </svg>
+                  Read at Meridian Wire
+                </a>
+              </p>
+            </div>
+
+            <!-- 4. Lead image, caption, credit -->
+            <figure class="hero">
+              <svg class="ph" viewBox="0 0 900 600" role="img" aria-labelledby="fig-hero" preserveAspectRatio="xMidYMid slice">
+                <title id="fig-hero">A substation switchyard at dawn with transmission towers behind it</title>
+                <defs>
+                  <linearGradient id="sky-hero" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0" stop-color="#54718c"></stop>
+                    <stop offset="0.42" stop-color="#adb6bb"></stop>
+                    <stop offset="1" stop-color="#e3d3b6"></stop>
+                  </linearGradient>
+                </defs>
+                <rect width="900" height="600" fill="url(#sky-hero)"></rect>
+                <circle cx="686" cy="352" r="58" fill="#f5e2be" opacity="0.68"></circle>
+                <path d="M0 372 L150 344 L300 368 L450 336 L610 366 L760 332 L900 358 L900 600 L0 600Z" fill="#8f8a76"></path>
+                <g stroke="#3b3931" stroke-width="3.4" fill="none">
+                  <path d="M160 396 L146 268 M160 396 L174 268 M146 268 L174 268"></path>
+                  <path d="M124 300 L196 300 M132 278 L188 278"></path>
+                  <path d="M520 404 L506 258 M520 404 L534 258 M506 258 L534 258"></path>
+                  <path d="M482 292 L558 292 M490 268 L550 268"></path>
+                  <path d="M820 392 L808 284 M820 392 L832 284 M808 284 L832 284"></path>
+                </g>
+                <g stroke="#4a4740" stroke-width="1.8" fill="none">
+                  <path d="M124 300 Q320 356 482 292"></path>
+                  <path d="M196 300 Q330 360 558 292"></path>
+                  <path d="M558 292 Q690 340 808 284"></path>
+                </g>
+                <rect x="0" y="404" width="900" height="196" fill="#7b7565"></rect>
+                <g stroke="#43413a" stroke-width="4" fill="none">
+                  <path d="M60 520V420M170 520V420M280 520V420M390 520V420M500 520V420M610 520V420M720 520V420M830 520V420"></path>
+                  <path d="M40 430H860M40 462H860"></path>
+                </g>
+                <g fill="#9aa0a4">
+                  <rect x="120" y="470" width="70" height="50" rx="3"></rect>
+                  <rect x="340" y="470" width="70" height="50" rx="3"></rect>
+                  <rect x="560" y="470" width="70" height="50" rx="3"></rect>
+                  <rect x="780" y="470" width="70" height="50" rx="3"></rect>
+                </g>
+                <rect x="0" y="536" width="900" height="64" fill="#5d584c"></rect>
+              </svg>
+              <figcaption class="caption">
+                A 500 kilovolt switchyard outside Fallon, Nevada, where two planned transformer replacements slipped past their June target.
+                <span class="credit">Priya Raman for Meridian Wire</span>
+              </figcaption>
+            </figure>
+
+            <!-- 5. Body -->
+            <div class="article__inner body">
+              <p>Operators responsible for keeping the lights on across roughly a third of the country told the Federal Energy Regulatory Commission on Tuesday that their August reserve margins now sit below the levels their own planning documents call adequate, a shift they attributed less to a shortage of generation than to equipment that has not been installed on schedule.</p>
+
+              <p>The filings, submitted separately by three regional transmission organizations, describe a summer in which demand has held above forecast overnight rather than only at the late afternoon peak. That pattern, operators wrote, compresses the window they normally use to bring units back from maintenance.</p>
+
+              <p>"We are not short of megawatts on paper," said Denise Aturu, who directs system planning at one of the three organizations. "We are short of the hours we usually count on to get equipment back in service, and that is a different problem with a different fix."</p>
+
+              <h2>What changed since the spring assessment</h2>
+
+              <p>In April, the same organizations projected reserve margins between 17 and 21 percent for the peak week of August. The figures filed this week fall between 12 and 16 percent. Two of the three now sit under their internal target, which is not the same as a reliability violation but does trigger a more conservative posture toward scheduled outages.</p>
+
+              <p>Three factors account for most of the revision, according to the filings:</p>
+
+              <ul>
+                <li>Transformer and breaker replacements at eleven substations slipped past their spring commissioning dates, most of them waiting on components with lead times that have not recovered since 2023.</li>
+                <li>Overnight minimum load ran 4 to 7 percent above the April forecast in June and the first three weeks of July, driven by data center ramps and by residential cooling that no longer drops off after midnight.</li>
+                <li>Two combined cycle plants that were expected to return from extended outages in June are now scheduled for late August.</li>
+              </ul>
+
+              <blockquote>
+                <p>The margin math looks the same whether a plant is missing or a transformer is missing. What is different is who fixes it and how long they have.</p>
+                <cite>Harold Lindqvist, former reliability engineer</cite>
+              </blockquote>
+
+              <p>None of the three operators asked the commission for emergency relief. All three asked for expedited treatment of pending interconnection agreements, which would not change August at all but would affect the 2027 and 2028 planning years.</p>
+
+              <div class="pullquote">
+                <p>"We are short of the hours we usually count on to get equipment back in service."</p>
+              </div>
+
+              <h2>The overnight load is the quieter story</h2>
+
+              <p>Utility planners have spent two decades treating the summer afternoon as the moment that defines system adequacy. The filings suggest that framing is aging. When overnight minimums rise, the system loses the slack it uses for maintenance, and the cost shows up months later as deferred work rather than as a visible shortfall.</p>
+
+              <figure class="figure">
+                <svg class="ph" viewBox="0 0 800 600" role="img" aria-labelledby="fig-control" preserveAspectRatio="xMidYMid slice">
+                  <title id="fig-control">Operators at a control room desk facing a wall of monitors</title>
+                  <rect width="800" height="600" fill="#252b33"></rect>
+                  <rect x="0" y="0" width="800" height="330" fill="#1c222a"></rect>
+                  <g>
+                    <rect x="46" y="52" width="200" height="120" rx="4" fill="#33506a"></rect>
+                    <rect x="266" y="52" width="200" height="120" rx="4" fill="#2f5a53"></rect>
+                    <rect x="486" y="52" width="200" height="120" rx="4" fill="#3b4a68"></rect>
+                    <rect x="46" y="188" width="310" height="110" rx="4" fill="#2d4a5e"></rect>
+                    <rect x="376" y="188" width="310" height="110" rx="4" fill="#4a4360"></rect>
+                  </g>
+                  <g stroke="#9fd0c9" stroke-width="2.6" fill="none" opacity="0.85">
+                    <path d="M286 150 L316 116 L346 132 L376 92 L406 108 L436 78"></path>
+                  </g>
+                  <g stroke="#a9c6e4" stroke-width="2.6" fill="none" opacity="0.8">
+                    <path d="M66 150 L106 126 L146 138 L186 104 L226 118"></path>
+                  </g>
+                  <g fill="#7f97b4" opacity="0.75">
+                    <rect x="66" y="252" width="18" height="34"></rect>
+                    <rect x="94" y="236" width="18" height="50"></rect>
+                    <rect x="122" y="260" width="18" height="26"></rect>
+                    <rect x="150" y="222" width="18" height="64"></rect>
+                    <rect x="178" y="244" width="18" height="42"></rect>
+                  </g>
+                  <rect x="0" y="330" width="800" height="30" fill="#39424d"></rect>
+                  <rect x="0" y="430" width="800" height="170" fill="#4a3f36"></rect>
+                  <rect x="0" y="418" width="800" height="18" rx="4" fill="#5d5044"></rect>
+                  <g fill="#2a323b">
+                    <rect x="120" y="356" width="110" height="66" rx="26"></rect>
+                    <rect x="380" y="350" width="110" height="72" rx="26"></rect>
+                    <rect x="620" y="358" width="110" height="64" rx="26"></rect>
+                  </g>
+                  <g fill="#8e7a63">
+                    <circle cx="175" cy="336" r="26"></circle>
+                    <circle cx="435" cy="330" r="26"></circle>
+                    <circle cx="675" cy="338" r="26"></circle>
+                  </g>
+                </svg>
+                <figcaption class="caption">
+                  The operations floor during Tuesday's morning shift change.
+                  <span class="credit">Priya Raman for Meridian Wire</span>
+                </figcaption>
+              </figure>
+
+              <p>Commission staff have not set a date for a technical conference. A spokesperson said the filings are under review and noted that the commission's own summer assessment, published in May, flagged transmission equipment delivery as a watch item in two of the three regions.</p>
+
+              <div class="factbox">
+                <h3>How reserve margin is measured</h3>
+                <p>Reserve margin compares expected available capacity against forecast peak demand, expressed as a percentage above that peak. A 15 percent margin means the operator expects 15 percent more capacity than it expects to need at the peak hour. Targets vary by region and are set by the operator, not by the commission.</p>
+              </div>
+
+              <p>State regulators in two of the affected states have scheduled their own hearings for mid-August. Utilities in both states have said publicly that they do not anticipate rotating outages, and both filings this week say the same, with the caveat that a multi-day heat event across two regions at once remains the scenario that stresses the assumptions hardest.</p>
+
+              <!-- Embed rendered as a native card. Never a live third party frame. -->
+              <figure class="embed">
+                <div class="embed__media">
+                  <svg viewBox="0 0 600 260" role="img" aria-labelledby="fig-chart">
+                    <title id="fig-chart">Line chart comparing April and July forecasts of August reserve margin, showing the July line four to five points lower across all three regions</title>
+                    <rect width="600" height="260" fill="none"></rect>
+                    <g stroke="#c9c2b4" stroke-width="1">
+                      <path d="M60 40H560M60 90H560M60 140H560M60 190H560"></path>
+                    </g>
+                    <g fill="#8a8479" font-family="-apple-system, system-ui, sans-serif" font-size="11">
+                      <text x="26" y="44">24%</text>
+                      <text x="26" y="94">18%</text>
+                      <text x="26" y="144">12%</text>
+                      <text x="30" y="194">6%</text>
+                      <text x="96" y="216">Region A</text>
+                      <text x="272" y="216">Region B</text>
+                      <text x="448" y="216">Region C</text>
+                    </g>
+                    <path d="M120 74 L300 62 L480 82" fill="none" stroke="#7d8c6b" stroke-width="3"></path>
+                    <path d="M120 124 L300 106 L480 136" fill="none" stroke="#b07a60" stroke-width="3"></path>
+                    <g fill="#7d8c6b"><circle cx="120" cy="74" r="4"></circle><circle cx="300" cy="62" r="4"></circle><circle cx="480" cy="82" r="4"></circle></g>
+                    <g fill="#b07a60"><circle cx="120" cy="124" r="4"></circle><circle cx="300" cy="106" r="4"></circle><circle cx="480" cy="136" r="4"></circle></g>
+                    <g font-family="-apple-system, system-ui, sans-serif" font-size="11.5">
+                      <rect x="120" y="234" width="10" height="3" fill="#7d8c6b"></rect>
+                      <text x="138" y="240" fill="#8a8479">April forecast</text>
+                      <rect x="248" y="234" width="10" height="3" fill="#b07a60"></rect>
+                      <text x="266" y="240" fill="#8a8479">July filing</text>
+                    </g>
+                  </svg>
+                </div>
+                <figcaption class="embed__body">
+                  <p class="embed__provider">
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true">
+                      <rect x="3.5" y="3.5" width="17" height="17" rx="3"></rect>
+                    </svg>
+                    Chart embed
+                  </p>
+                  <p class="embed__title">August reserve margin: April forecast against this week's filing</p>
+                  <p class="embed__meta">Static export shown. <a href="https://example.com/meridian-wire/grid-reserve-margins#chart" target="_blank" rel="noopener noreferrer">Open the interactive version</a></p>
+                </figcaption>
+              </figure>
+
+              <p>For readers outside the three regions, the practical signal is narrower than the headline number suggests. Reserve margin is a planning statistic, not a forecast of outages, and it moves for reasons that have nothing to do with whether a given August afternoon goes smoothly. What the filings document is a supply chain problem arriving on a planner's calendar.</p>
+
+              <p>Aturu put it more plainly. "Ask me in October," she said. "If we spend the fall catching up on the maintenance we deferred this summer, then this was a hard year. If we do not, then this is the first year of a pattern."</p>
+            </div>
+
+            <!-- 6. Perspective: source baseline and article status, kept separate -->
+            <div class="article__inner">
+              <section class="perspective" aria-labelledby="persp-title">
+                <h2 id="persp-title">Perspective</h2>
+
+                <div class="prow">
+                  <span class="prow__label">This article</span>
+                  <span class="prow__value">
+                    Not assessed
+                    <span class="prow__sub">Broadsheet does not rate individual articles</span>
+                  </span>
+                </div>
+
+                <div class="prow">
+                  <span class="prow__label">Meridian Wire</span>
+                  <span class="prow__value">
+                    Center
+                    <span class="prow__sub">AllSides, March 2026</span>
+                  </span>
+                </div>
+
+                <p class="perspective__note">
+                  A publisher baseline describes a body of work over time. It does not describe this piece of reporting.
+                  <button type="button" class="textlink" data-open="sheet-provenance" aria-haspopup="dialog">See method and date</button>
+                </p>
+              </section>
+
+              <!-- 7. Canonical publisher action again, full width -->
+              <p class="article__cta">
+                <a class="btn" href="https://example.com/meridian-wire/grid-reserve-margins" target="_blank" rel="noopener noreferrer">
+                  <svg class="arrow" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M8 16L16.5 7.5"></path>
+                    <path d="M9.5 7.5h7v7"></path>
+                  </svg>
+                  Read the original at Meridian Wire
+                </a>
+              </p>
+
+              <p class="attribution">
+                Reported and published by <strong>Meridian Wire</strong>. Broadsheet reformats articles for reading on this device. The text and images belong to the publisher.
+              </p>
+
+              <!-- 8. Related coverage -->
+              <section class="related" aria-labelledby="related-title">
+                <h2 id="related-title">Other coverage of this story</h2>
+                <ul>
+                  <li>
+                    <a class="csrc" href="index.html">
+                      <span class="mark" aria-hidden="true">CB</span>
+                      <span>
+                        <span class="csrc__name">Cascade Business Daily</span>
+                        <span class="csrc__hed">Transformer backlog lands on the summer reliability ledger</span>
+                        <span class="csrc__meta">
+                          <span class="lean"><span class="lean__tick" data-pos="cr" aria-hidden="true"><i></i></span>Center-right</span>
+                          <span>5:02 AM</span>
+                        </span>
+                      </span>
+                    </a>
+                  </li>
+                  <li>
+                    <a class="csrc" href="index.html">
+                      <span class="mark" aria-hidden="true">CP</span>
+                      <span>
+                        <span class="csrc__name">Coastline Public Radio</span>
+                        <span class="csrc__hed">What thinner reserves actually mean for an August heat wave</span>
+                        <span class="csrc__meta">
+                          <span class="lean"><span class="lean__tick" data-pos="cl" aria-hidden="true"><i></i></span>Center-left</span>
+                          <span>6:20 AM</span>
+                        </span>
+                      </span>
+                    </a>
+                  </li>
+                  <li>
+                    <a class="csrc" href="index.html">
+                      <span class="mark" aria-hidden="true">BC</span>
+                      <span>
+                        <span class="csrc__name">Basin Chronicle</span>
+                        <span class="csrc__hed">Two plant returns slip to late August, filings show</span>
+                        <span class="csrc__meta">
+                          <span class="lean"><span class="lean__tick" data-pos="na" aria-hidden="true"><i></i></span>Not rated</span>
+                          <span>6:35 AM</span>
+                        </span>
+                      </span>
+                    </a>
+                  </li>
+                </ul>
+              </section>
+            </div>
+
+          </article>
+        </main>
+      </div>
+
+      <p class="toast" role="status" aria-live="polite" data-show="false"></p>
+
+    </div>
+  </div>
+</div>
+
+<!-- ============ Sheets ============ -->
+
+<dialog class="sheet" id="sheet-reading" aria-labelledby="reading-title">
+  <div class="sheet__head">
+    <h2 class="sheet__title" id="reading-title">Reading settings</h2>
+    <button type="button" class="sheet__close" data-close>Done</button>
+  </div>
+  <div class="sheet__body">
+    <div class="setting">
+      <p class="setting__label" id="lbl-size">Text size</p>
+      <div class="segmented" role="group" aria-labelledby="lbl-size">
+        <button type="button" data-size-set="s" aria-pressed="false">Small</button>
+        <button type="button" data-size-set="m" aria-pressed="true">Default</button>
+        <button type="button" data-size-set="l" aria-pressed="false">Large</button>
+        <button type="button" data-size-set="xl" aria-pressed="false">Larger</button>
+      </div>
+    </div>
+
+    <div class="setting">
+      <p class="setting__label" id="lbl-face">Body typeface</p>
+      <div class="segmented segmented--serif" role="group" aria-labelledby="lbl-face">
+        <button type="button" data-body-set="serif" aria-pressed="true">Serif</button>
+        <button type="button" data-body-set="sans" aria-pressed="false">Sans</button>
+      </div>
+    </div>
+
+    <div class="setting">
+      <p class="setting__label" id="lbl-theme">Theme</p>
+      <div class="segmented" role="group" aria-labelledby="lbl-theme">
+        <button type="button" data-theme-set="auto" aria-pressed="true">Auto</button>
+        <button type="button" data-theme-set="paper" aria-pressed="false">Paper</button>
+        <button type="button" data-theme-set="night" aria-pressed="false">Night</button>
+        <button type="button" data-theme-set="oled" aria-pressed="false">OLED</button>
+      </div>
+    </div>
+  </div>
+</dialog>
+
+<dialog class="sheet" id="sheet-provenance" aria-labelledby="prov-title">
+  <div class="sheet__head">
+    <h2 class="sheet__title" id="prov-title">Source baseline: Meridian Wire</h2>
+    <button type="button" class="sheet__close" data-close>Done</button>
+  </div>
+  <div class="sheet__body">
+    <p>This is a rating of the publisher, not of the article you are reading. It comes from a bundled snapshot, so it does not change while you read and it does not send anything over the network.</p>
+    <dl class="sheet__dl">
+      <div><dt>Rating</dt><dd>Center</dd></div>
+      <div><dt>Provider</dt><dd>AllSides</dd></div>
+      <div><dt>Rated</dt><dd>March 2026</dd></div>
+      <div><dt>Method</dt><dd>Blind survey and editorial review</dd></div>
+      <div><dt>Confidence</dt><dd>Rated</dd></div>
+      <div><dt>Second provider</dt><dd>None loaded</dd></div>
+      <div><dt>This article</dt><dd>Not assessed</dd></div>
+    </dl>
+    <p>When two providers disagree by more than one step, Broadsheet shows both ratings rather than averaging them. Averaging would invent precision that neither provider claims.</p>
+    <p><a class="textlink" href="https://www.allsides.com/about/media-bias-rating-methods" target="_blank" rel="noopener noreferrer">Read the provider's method</a></p>
+  </div>
+</dialog>
+
+<script src="app.js"></script>
+</body>
+</html>
