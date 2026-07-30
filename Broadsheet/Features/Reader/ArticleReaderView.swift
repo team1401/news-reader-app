@@ -68,6 +68,7 @@ struct ArticleReaderView: View {
             BaselineProvenanceSheet(publisher: article.publisher)
         }
         .task {
+            model.markRead(article)
             await model.analysis.analyze(article)
         }
     }
@@ -331,9 +332,10 @@ struct ArticleReaderView: View {
 }
 
 #Preview {
-    let model = AppModel()
-    return NavigationStack {
-        ArticleReaderView(article: model.edition.lead)
+    let model = AppModel.preview()
+    let article = model.displayedEdition?.lead ?? DemoEdition.edition().lead
+    NavigationStack {
+        ArticleReaderView(article: article)
     }
     .environment(model)
 }

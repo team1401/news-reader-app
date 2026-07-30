@@ -12,9 +12,30 @@ import Observation
 ///   The fixture heuristic is never substituted for a real model, because that
 ///   would present a rule-based guess as machine analysis.
 @MainActor
+public protocol BiasAnalysisPersisting: AnyObject {
+    func persistAnalysis(_ result: BiasAnalysisResult, for id: ArticleID, at date: Date)
+    func persistAnalysisFailure(
+        reason: String,
+        engine: BiasEngine,
+        modelVersion: String,
+        for id: ArticleID,
+        at date: Date
+    )
+    func setCorrection(_ label: BiasLabel?, for id: ArticleID)
+}
+
+@MainActor
 @Observable
 public final class BiasAnalysisService {
+    /// How many articles are analyzed at once. On-device inference is serial in
+    /// practice, and an unbounded group would queue the whole refresh at once.
+    public static let concurrencyLimit = 3
+
     public private(set) var states: [ArticleID: BiasAnalysisState] = [:]
+
+    /// Where results are written so a label survives relaunch. Optional so the
+    /// service still works in previews and pure-logic tests.
+    @ObservationIgnored public weak var persistence: (any BiasAnalysisPersisting)?
 
     private let cache: BiasAnalysisCache
     private let fixtureAnalyzer: any BiasAnalyzing
@@ -56,6 +77,16 @@ public final class BiasAnalysisService {
         } else {
             corrections.removeValue(forKey: article.id)
         }
+        persistence?.setCorrection(label, for: article.id)
+    }
+
+    /// Restores persisted results and corrections at launch, so a label computed
+    /// during yesterday's refresh is on the card before anything is recomputed.
+    public func hydrate(states: [ArticleID: BiasAnalysisState], corrections: [ArticleID: BiasLabel]) {
+        for (id, state) in states {
+            self.states[id] = state
+        }
+        self.corrections = corrections
     }
 
     private func analyzer(for article: ArticleDocument) -> any BiasAnalyzing {
@@ -68,11 +99,24 @@ public final class BiasAnalysisService {
     /// Analyzes a batch during refresh, prioritizing headline and dek so the badge
     /// is ready before the reader scrolls to the story.
     public func analyzeEagerly(_ articles: [ArticleDocument]) async {
+        let pending = articles.filter { states[$0.id]?.result == nil }
+        guard !pending.isEmpty else { return }
+
         await withTaskGroup(of: Void.self) { group in
-            for article in articles where states[article.id]?.result == nil {
-                group.addTask { @MainActor in
-                    await self.analyze(article)
-                }
+            var index = 0
+            let limit = min(BiasAnalysisService.concurrencyLimit, pending.count)
+
+            for _ in 0..<limit {
+                let article = pending[index]
+                index += 1
+                group.addTask { @MainActor in await self.analyze(article) }
+            }
+
+            while await group.next() != nil {
+                guard index < pending.count else { continue }
+                let article = pending[index]
+                index += 1
+                group.addTask { @MainActor in await self.analyze(article) }
             }
         }
     }
@@ -99,10 +143,27 @@ public final class BiasAnalysisService {
                 try await analyzer.analyze(input)
             }
             state = .analyzed(result)
+            persistence?.persistAnalysis(result, for: article.id, at: Date())
         } catch let error as BiasAnalysisError {
-            state = .unavailable(reason: error.errorDescription ?? "Local analysis could not run.")
+            let reason = error.errorDescription ?? "Local analysis could not run."
+            state = .unavailable(reason: reason)
+            persistence?.persistAnalysisFailure(
+                reason: reason,
+                engine: analyzer.engine,
+                modelVersion: key.modelVersion,
+                for: article.id,
+                at: Date()
+            )
         } catch {
-            state = .unavailable(reason: error.localizedDescription)
+            let reason = error.localizedDescription
+            state = .unavailable(reason: reason)
+            persistence?.persistAnalysisFailure(
+                reason: reason,
+                engine: analyzer.engine,
+                modelVersion: key.modelVersion,
+                for: article.id,
+                at: Date()
+            )
         }
 
         states[article.id] = state

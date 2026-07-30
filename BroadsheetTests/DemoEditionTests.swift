@@ -13,8 +13,9 @@ final class DemoEditionTests: XCTestCase {
         XCTAssertEqual(DemoEdition.edition(referenceDate: referenceDate), edition)
     }
 
-    func testEditionHasALeadAClusterAndARiver() {
-        XCTAssertGreaterThanOrEqual(edition.cluster.articles.count, 3)
+    func testEditionHasALeadAClusterAndARiver() throws {
+        let cluster = try XCTUnwrap(edition.cluster)
+        XCTAssertGreaterThanOrEqual(cluster.articles.count, 3)
         XCTAssertGreaterThanOrEqual(edition.river.count, 4)
         XCTAssertGreaterThanOrEqual(edition.allArticles.count, 8)
     }
@@ -132,10 +133,11 @@ final class DemoEditionTests: XCTestCase {
         XCTAssertEqual(labels, Set(BiasLabel.allCases), "Missing labels: \(Set(BiasLabel.allCases).subtracting(labels))")
     }
 
-    func testClusterBaselineDistributionCoversSeveralSources() {
-        let distribution = edition.cluster.baselineDistribution
+    func testClusterBaselineDistributionCoversSeveralSources() throws {
+        let cluster = try XCTUnwrap(edition.cluster)
+        let distribution = cluster.baselineDistribution
         XCTAssertGreaterThanOrEqual(distribution.count, 3)
-        XCTAssertEqual(distribution.reduce(0) { $0 + $1.count }, edition.cluster.articles.count)
+        XCTAssertEqual(distribution.reduce(0) { $0 + $1.count }, cluster.articles.count)
     }
 
     func testBaselineBucketsMapFromRatingText() {

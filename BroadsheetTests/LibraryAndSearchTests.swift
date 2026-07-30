@@ -62,16 +62,22 @@ final class ArticleSearchIndexTests: XCTestCase {
 @MainActor
 final class LibraryTests: XCTestCase {
 
+    /// The demo edition is the deterministic content, so these exercise reader
+    /// state against fixed articles. Live persistence has its own suite.
     private func makeModel() -> AppModel {
-        AppModel(
-            edition: DemoEdition.edition(referenceDate: Date(timeIntervalSince1970: 1_800_000_000)),
-            analysis: BiasAnalysisService()
-        )
+        let store = try! BroadsheetStore(inMemory: true)
+        let model = AppModel(store: store, analysis: BiasAnalysisService(), buildsPipeline: false)
+        model.isDemoMode = true
+        return model
     }
 
-    func testSavingAndRemovingStories() {
+    private func edition(_ model: AppModel) throws -> EditionContent {
+        try XCTUnwrap(model.displayedEdition)
+    }
+
+    func testSavingAndRemovingStories() throws {
         let model = makeModel()
-        let article = model.edition.lead
+        let article = try edition(model).lead
 
         XCTAssertFalse(model.isSaved(article))
 
@@ -84,10 +90,11 @@ final class LibraryTests: XCTestCase {
         XCTAssertTrue(model.savedArticles.isEmpty)
     }
 
-    func testMostRecentlySavedStoryAppearsFirst() {
+    func testMostRecentlySavedStoryAppearsFirst() throws {
         let model = makeModel()
-        let first = model.edition.lead
-        let second = model.edition.river[0]
+        let content = try edition(model)
+        let first = content.lead
+        let second = content.river[0]
 
         model.toggleSaved(first)
         model.toggleSaved(second)
@@ -95,9 +102,9 @@ final class LibraryTests: XCTestCase {
         XCTAssertEqual(model.savedArticles.map(\.id), [second.id, first.id])
     }
 
-    func testRemoveSavedIsIdempotent() {
+    func testRemoveSavedIsIdempotent() throws {
         let model = makeModel()
-        let article = model.edition.lead
+        let article = try edition(model).lead
 
         model.removeSaved(article)
         model.toggleSaved(article)
@@ -107,33 +114,32 @@ final class LibraryTests: XCTestCase {
         XCTAssertTrue(model.savedArticles.isEmpty)
     }
 
-    func testSourcesAreDeduplicatedAndSorted() {
+    func testDemoSavesNeverReachTheDurableLibrary() throws {
         let model = makeModel()
-        let names = model.sources.map(\.name)
+        let article = try edition(model).lead
 
-        XCTAssertEqual(Set(names).count, names.count)
-        XCTAssertEqual(names, names.sorted())
-        XCTAssertTrue(names.contains("Meridian Wire"))
+        model.toggleSaved(article)
+
+        XCTAssertTrue(model.isSaved(article))
+        XCTAssertTrue(model.store.savedArticles().isEmpty, "Demo fiction must not be written to the reader's library")
+        XCTAssertEqual(model.store.articleCount(), 0)
     }
 
-    func testArticleLookupByIdentity() {
+    func testArticleLookupByIdentity() throws {
         let model = makeModel()
-        let article = model.edition.river[1]
+        let article = try edition(model).river[1]
 
         XCTAssertEqual(model.article(with: article.id)?.title, article.title)
         XCTAssertNil(model.article(with: ArticleID(rawValue: "guid:nothing")))
     }
 
-    func testRefreshRebuildsTheEditionAndAnalyzesEagerly() async {
+    func testEagerAnalysisLabelsEveryVisibleStory() async throws {
         let model = makeModel()
-        let newDate = Date(timeIntervalSince1970: 1_800_100_000)
 
-        await model.refresh(referenceDate: newDate)
+        await model.analyzeVisible()
 
-        XCTAssertEqual(model.lastRefreshedAt, newDate)
-        XCTAssertFalse(model.isRefreshing)
         for article in model.allArticles {
-            XCTAssertNotNil(model.state(for: article).result, "“\(article.title)” had no label after refresh")
+            XCTAssertNotNil(model.state(for: article).result, "\u{201C}\(article.title)\u{201D} had no label after analysis")
         }
     }
 

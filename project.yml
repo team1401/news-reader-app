@@ -7,6 +7,27 @@ options:
 settings:
   base:
     SWIFT_VERSION: "5.0"
+schemes:
+  # Run on purpose, never as part of the offline suite.
+  BroadsheetNetworkSmokeTests:
+    build:
+      targets:
+        Broadsheet: [test]
+        BroadsheetNetworkSmokeTests: [test]
+    test:
+      targets:
+        - BroadsheetNetworkSmokeTests
+
+  # Drives the shipping app against the real network to capture screenshots.
+  BroadsheetScreenshots:
+    build:
+      targets:
+        Broadsheet: [test]
+        BroadsheetScreenshots: [test]
+    test:
+      targets:
+        - BroadsheetScreenshots
+
 targets:
   Broadsheet:
     type: application
@@ -14,11 +35,21 @@ targets:
     deploymentTarget: "18.0"
     sources:
       - path: Broadsheet
+        excludes:
+          - "Extraction/Vendor/**"
+      # Vendored third-party JavaScript and its license ship as resources, so the
+      # Apache 2.0 licence travels with the binary that uses it.
+      - path: Broadsheet/Extraction/Vendor
+        buildPhase: resources
     settings:
       base:
         TARGETED_DEVICE_FAMILY: "1,2"
         PRODUCT_BUNDLE_IDENTIFIER: com.helix.broadsheet
         ENABLE_PREVIEWS: YES
+    scheme:
+      testTargets:
+        - BroadsheetTests
+        - BroadsheetUITests
     info:
       path: Broadsheet/Info.plist
       properties:
@@ -35,6 +66,36 @@ targets:
           - UIInterfaceOrientationLandscapeRight
         UIApplicationSceneManifest:
           UIApplicationSupportsMultipleScenes: false
+  # The real-network smoke check lives in its own target so it is not part of the
+  # Broadsheet scheme's test action. The offline suite therefore never depends on
+  # a publisher being reachable, and the smoke check is run deliberately with
+  # `-scheme BroadsheetNetworkSmokeTests`.
+  BroadsheetNetworkSmokeTests:
+    type: bundle.unit-test
+    platform: iOS
+    deploymentTarget: "18.0"
+    sources:
+      - path: BroadsheetNetworkSmokeTests
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.helix.broadsheet.networksmoketests
+        TARGETED_DEVICE_FAMILY: "1,2"
+    dependencies:
+      - target: Broadsheet
+
+  BroadsheetScreenshots:
+    type: bundle.ui-testing
+    platform: iOS
+    deploymentTarget: "18.0"
+    sources:
+      - path: BroadsheetScreenshots
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.helix.broadsheet.screenshots
+        TARGETED_DEVICE_FAMILY: "1,2"
+    dependencies:
+      - target: Broadsheet
+
   BroadsheetTests:
     type: bundle.unit-test
     platform: iOS

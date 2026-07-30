@@ -25,6 +25,10 @@ public enum BSColor {
     public static let accent = dynamic(light: 0x2E5A44, dark: 0x7FB99C)
     public static let accentSoft = dynamic(light: 0xEEF5F1, dark: 0x1E2E26)
 
+    /// For refresh failures and restricted-content notices. A muted clay rather
+    /// than an alarm red: a stale source is information, not an emergency.
+    public static let warning = dynamic(light: 0x9A5638, dark: 0xD09070)
+
     /// Foreground and background for an article-level estimate capsule.
     /// Colour supports scanning; the label is always readable without it.
     public static func lean(_ label: BiasLabel) -> (foreground: Color, background: Color) {

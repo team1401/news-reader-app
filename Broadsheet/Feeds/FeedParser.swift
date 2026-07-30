@@ -5,6 +5,15 @@ import Foundation
 public enum FeedFormat: String, Equatable, Sendable {
     case rss
     case atom
+    case jsonFeed
+
+    public var displayName: String {
+        switch self {
+        case .rss: return "RSS"
+        case .atom: return "Atom"
+        case .jsonFeed: return "JSON Feed"
+        }
+    }
 }
 
 public struct ParsedFeedItem: Equatable, Sendable {
@@ -39,6 +48,9 @@ public enum FeedParsingError: Error, Equatable, LocalizedError {
     case emptyDocument
     case malformedXML(line: Int, column: Int, message: String)
     case unsupportedFormat(rootElement: String?)
+    case malformedJSON(message: String)
+    case notAJSONFeed
+    case unsupportedJSONFeedVersion(String)
 
     public var errorDescription: String? {
         switch self {
@@ -51,6 +63,12 @@ public enum FeedParsingError: Error, Equatable, LocalizedError {
                 return "Expected an RSS or Atom feed but found a <\(rootElement)> document."
             }
             return "The response is not an RSS or Atom feed."
+        case .malformedJSON(let message):
+            return "The feed is not valid JSON: \(message)"
+        case .notAJSONFeed:
+            return "The response is JSON, but it is not a JSON Feed document."
+        case .unsupportedJSONFeedVersion(let version):
+            return "Broadsheet supports JSON Feed 1 and 1.1, and this feed declares “\(version)”."
         }
     }
 }

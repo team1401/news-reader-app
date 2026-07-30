@@ -187,13 +187,26 @@ public enum ExtractionStatus: Codable, Equatable, Sendable {
     case full
     case partial(note: String)
     case feedOnly
+    /// Broadsheet tried to read the full article and could not, and `reason` says
+    /// why in the reader's own words. The feed excerpt is shown instead; nothing
+    /// is invented to fill the gap.
+    case excerptOnly(reason: String)
     case paywalled(note: String)
     case failed(reason: String)
 
     public var isReadableInApp: Bool {
         switch self {
-        case .full, .partial, .feedOnly, .paywalled: return true
+        case .full, .partial, .feedOnly, .excerptOnly, .paywalled: return true
         case .failed: return false
+        }
+    }
+
+    /// True when the reader is seeing the publisher's excerpt rather than the
+    /// article, so the surface can push them to the original.
+    public var isExcerptOnly: Bool {
+        switch self {
+        case .feedOnly, .excerptOnly, .paywalled: return true
+        case .full, .partial, .failed: return false
         }
     }
 
@@ -205,10 +218,23 @@ public enum ExtractionStatus: Codable, Equatable, Sendable {
             return note
         case .feedOnly:
             return "Only the publisher-supplied excerpt was available. Read the full story at the publisher."
+        case .excerptOnly(let reason):
+            return reason
         case .paywalled(let note):
             return note
         case .failed(let reason):
             return reason
+        }
+    }
+
+    /// A short status for the source list and the story card.
+    public var shortLabel: String? {
+        switch self {
+        case .full: return nil
+        case .partial: return "Partial"
+        case .feedOnly, .excerptOnly: return "Excerpt only"
+        case .paywalled: return "Publisher restricted"
+        case .failed: return "Unavailable"
         }
     }
 }

@@ -56,4 +56,26 @@ public enum FeedArticleMapper {
         let identifier = domain.isEmpty ? name.lowercased() : domain
         return Publisher(id: identifier, name: name, domain: domain, baseline: nil)
     }
+
+    /// The publisher for a subscribed source. The reader's own title for the
+    /// source wins, because they may well have renamed it deliberately.
+    public static func publisher(for feed: ParsedFeed, source: FeedSource) -> Publisher {
+        let derived = publisher(for: feed, feedURL: source.feedURL)
+        let title = source.title.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !title.isEmpty else { return derived }
+        return Publisher(id: derived.id, name: title, domain: derived.domain, baseline: derived.baseline)
+    }
+
+    /// Maps a whole feed, pairing each article with the publisher-supplied content
+    /// HTML so the resolver can prefer it without re-parsing the feed.
+    public static func articles(
+        from feed: ParsedFeed,
+        source: FeedSource,
+        fetchedAt: Date
+    ) -> [(document: ArticleDocument, contentHTML: String?)] {
+        let publisher = publisher(for: feed, source: source)
+        return feed.items.map { item in
+            (article(from: item, publisher: publisher, fetchedAt: fetchedAt), item.contentHTML)
+        }
+    }
 }

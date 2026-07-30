@@ -27,11 +27,26 @@ public struct CoverageCluster: Identifiable, Equatable, Sendable {
 public struct EditionContent: Equatable, Sendable {
     public let editionDate: Date
     public let lead: ArticleDocument
-    public let cluster: CoverageCluster
+    /// `nil` when no two publishers in the cache covered the same event. The
+    /// coverage band is then simply absent rather than padded with a single story
+    /// pretending to be a cluster.
+    public let cluster: CoverageCluster?
     public let river: [ArticleDocument]
 
+    public init(
+        editionDate: Date,
+        lead: ArticleDocument,
+        cluster: CoverageCluster?,
+        river: [ArticleDocument]
+    ) {
+        self.editionDate = editionDate
+        self.lead = lead
+        self.cluster = cluster
+        self.river = river
+    }
+
     public var allArticles: [ArticleDocument] {
-        [lead] + cluster.articles + river
+        [lead] + (cluster?.articles ?? []) + river
     }
 }
 

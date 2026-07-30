@@ -106,5 +106,5 @@ struct SearchView: View {
 
 #Preview {
     SearchView()
-        .environment(AppModel())
+        .environment(AppModel.preview())
 }

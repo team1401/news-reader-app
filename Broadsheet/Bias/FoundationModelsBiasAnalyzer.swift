@@ -33,6 +33,13 @@ struct GeneratedLeanEstimate {
 public struct FoundationModelsBiasAnalyzer: BiasAnalyzing {
     public static let version = "apple-system-lm+broadsheet-prompt-1.0"
 
+    /// The prompt that has actually been measured against live reporting.
+    ///
+    /// A reframing — asking for a description of how a passage is written rather
+    /// than for a political judgement — is the obvious next experiment, because in
+    /// the measured run the system model refused 55 of 82 live articles. It is not
+    /// shipped here: the simulator lost its model assets before it could be
+    /// measured, and an unmeasured prompt change is not an improvement.
     private static let instructions = """
     You are a media-analysis function that estimates the political leaning of a \
     single news article from its text alone.
@@ -54,10 +61,28 @@ public struct FoundationModelsBiasAnalyzer: BiasAnalyzing {
 
     public var engine: BiasEngine { .appleFoundationModels }
 
+    #if canImport(FoundationModels)
+    /// The model configured for content transformation.
+    ///
+    /// News is about conflict, crime, disaster, and politics, so the default
+    /// guardrail rejects most real reporting outright — in one live run against the
+    /// four starter feeds it refused 55 of 82 articles. Apple provides
+    /// `permissiveContentTransformations` for exactly this shape of work: text the
+    /// user chose to bring into the app, being analyzed rather than generated. It
+    /// changes what the model will *read*, not what Broadsheet will *show*: output
+    /// is still constrained to four labels, evidence is still checked verbatim
+    /// against the supplied text, and nothing is written that the article did not
+    /// say.
+    @available(iOS 26.0, macOS 26.0, *)
+    private static var model: SystemLanguageModel {
+        SystemLanguageModel(guardrails: .permissiveContentTransformations)
+    }
+    #endif
+
     public var isAvailable: Bool {
         #if canImport(FoundationModels)
         if #available(iOS 26.0, macOS 26.0, *) {
-            return SystemLanguageModel.default.availability == .available
+            return Self.model.availability == .available
         }
         return false
         #else
@@ -68,7 +93,7 @@ public struct FoundationModelsBiasAnalyzer: BiasAnalyzing {
     public var availabilityDescription: String {
         #if canImport(FoundationModels)
         if #available(iOS 26.0, macOS 26.0, *) {
-            switch SystemLanguageModel.default.availability {
+            switch Self.model.availability {
             case .available:
                 return "Apple's on-device system language model is ready."
             case .unavailable(.deviceNotEligible):
@@ -96,7 +121,7 @@ public struct FoundationModelsBiasAnalyzer: BiasAnalyzing {
         guard #available(iOS 26.0, macOS 26.0, *) else {
             throw BiasAnalysisError.localModelUnavailable(reason: availabilityDescription)
         }
-        guard SystemLanguageModel.default.availability == .available else {
+        guard Self.model.availability == .available else {
             throw BiasAnalysisError.localModelUnavailable(reason: availabilityDescription)
         }
         return try await runSystemModel(input)
@@ -108,7 +133,7 @@ public struct FoundationModelsBiasAnalyzer: BiasAnalyzing {
     #if canImport(FoundationModels)
     @available(iOS 26.0, macOS 26.0, *)
     private func runSystemModel(_ input: BiasModelInput) async throws -> BiasAnalysisResult {
-        let session = LanguageModelSession(instructions: Self.instructions)
+        let session = LanguageModelSession(model: Self.model, instructions: Self.instructions)
         let options = GenerationOptions(temperature: 0.0)
 
         let prompt = """
@@ -135,12 +160,43 @@ public struct FoundationModelsBiasAnalyzer: BiasAnalyzing {
                 throw BiasAnalysisError.generationFailed(
                     reason: "The article was too long for the on-device model's context window."
                 )
-            default:
+            case .guardrailViolation:
+                // Said plainly, because "detected content likely to be unsafe" tells
+                // the reader nothing about their own newspaper.
                 throw BiasAnalysisError.generationFailed(
-                    reason: error.errorDescription ?? "The on-device model could not complete the analysis."
+                    reason: "Apple's on-device model declined to analyze this article's subject matter, so Broadsheet has no estimate for it."
+                )
+            case .unsupportedLanguageOrLocale:
+                throw BiasAnalysisError.generationFailed(
+                    reason: "The on-device model does not support this article's language."
+                )
+            case .refusal:
+                throw BiasAnalysisError.generationFailed(
+                    reason: "Apple's on-device model declined to classify this article, so Broadsheet has no estimate for it."
+                )
+            case .rateLimited, .concurrentRequests:
+                throw BiasAnalysisError.generationFailed(
+                    reason: "The on-device model was busy. Analysis will be retried on the next refresh."
+                )
+            default:
+                // `GenerationError` does not always carry a useful description, and
+                // "the operation couldn't be completed" is not a diagnosis. Name the
+                // case so a failure is at least traceable.
+                throw BiasAnalysisError.generationFailed(
+                    reason: "The on-device model could not complete the analysis (\(Self.caseName(of: error)))."
                 )
             }
         } catch {
+            // The framework sometimes surfaces a generation failure as a bridged
+            // `NSError` whose domain is the Swift type name, in which case the
+            // `as` cast above misses it and `localizedDescription` is the useless
+            // "the operation couldn't be completed". Report something traceable.
+            let nsError = error as NSError
+            if nsError.domain.contains("GenerationError") {
+                throw BiasAnalysisError.generationFailed(
+                    reason: "Apple's on-device model could not complete the analysis on this device (\(nsError.domain.components(separatedBy: ".").last ?? nsError.domain) \(nsError.code))."
+                )
+            }
             throw BiasAnalysisError.generationFailed(reason: error.localizedDescription)
         }
 
@@ -164,6 +220,24 @@ public struct FoundationModelsBiasAnalyzer: BiasAnalyzing {
                 modelVersion: Self.version
             )
         )
+    }
+    #endif
+
+    #if canImport(FoundationModels)
+    @available(iOS 26.0, macOS 26.0, *)
+    static func caseName(of error: LanguageModelSession.GenerationError) -> String {
+        switch error {
+        case .exceededContextWindowSize: return "context window exceeded"
+        case .assetsUnavailable: return "model assets unavailable"
+        case .guardrailViolation: return "guardrail violation"
+        case .unsupportedGuide: return "unsupported guide"
+        case .unsupportedLanguageOrLocale: return "unsupported language"
+        case .decodingFailure: return "decoding failure"
+        case .rateLimited: return "rate limited"
+        case .concurrentRequests: return "concurrent requests"
+        case .refusal: return "model refusal"
+        @unknown default: return "unrecognised error"
+        }
     }
     #endif
 
